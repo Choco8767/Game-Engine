@@ -1,5 +1,13 @@
 target_sources(${PROJECT_NAME} PRIVATE
+    # App
     "App/main.cpp"
+    "App/App.cpp"
+
+    # Window
+    "Window/Window.cpp"
+    "Window/GLFW/GLFWWindow.cpp"
+
+    "Graphics/Vulkan/VulkanRenderer.cpp"
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
