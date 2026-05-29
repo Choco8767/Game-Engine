@@ -27,6 +27,20 @@ add_executable(${PROJECT_NAME})
 add_subdirectory(src)
 add_subdirectory(shaders)
 
+# Link Libraries
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    glfw
+    glm::glm
+    Vulkan::Vulkan
+)
+
+# Add Defines
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    GLM_ENABLE_EXPERIMENTAL
+)
+
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION "."
 )
+install(FILES $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+    DESTINATION ".")
