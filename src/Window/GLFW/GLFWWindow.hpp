@@ -16,11 +16,16 @@ public:
         int width,
         int height,
         const char *title) override;
+
+    std::optional<VkSurfaceKHR> CreateVulkanWindowSurface(VkInstance vkInstance) override;
+
     void Destroy() override;
 
     void PollEvents() override;
 
     bool ShouldClose() const override;
+    int GetWidth() const override;
+    int GetHeight() const override;
 
     std::vector<const char *> GetRequiredInstanceExtensions() const override;
 

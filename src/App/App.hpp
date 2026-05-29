@@ -8,6 +8,7 @@
 namespace Engine {
 
 class Window;
+class Renderer;
 
 }
 
@@ -23,4 +24,5 @@ private:
     void Loop();
 
     std::unique_ptr<Engine::Window> m_window;
+    std::unique_ptr<Engine::Renderer> m_renderer;
 };

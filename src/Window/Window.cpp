@@ -13,8 +13,11 @@ std::unique_ptr<Window> CreateWindow(WindowAPI api)
         window = std::make_unique<GLFW::WindowBackend>();
         break;
     default:
-        return nullptr;
+        break;
     }
+
+    if (!window)
+        return nullptr;
 
     window->Init();
 

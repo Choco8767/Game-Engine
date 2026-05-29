@@ -1,14 +1,6 @@
-target_sources(${PROJECT_NAME} PRIVATE
-    # App
-    "App/main.cpp"
-    "App/App.cpp"
+include("${CMAKE_CURRENT_SOURCE_DIR}/Sources.cmake")
 
-    # Window
-    "Window/Window.cpp"
-    "Window/GLFW/GLFWWindow.cpp"
-
-    "Graphics/Vulkan/VulkanRenderer.cpp"
-)
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}

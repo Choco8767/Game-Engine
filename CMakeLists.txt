@@ -26,3 +26,7 @@ add_executable(${PROJECT_NAME})
 # Subdirectories
 add_subdirectory(src)
 add_subdirectory(shaders)
+
+install(TARGETS ${PROJECT_NAME}
+        RUNTIME DESTINATION "."
+)
