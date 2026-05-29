@@ -1,6 +1,6 @@
-# Vulkan Engine
+# Game Engine
 
-**A simple Vulkan Engine built with C++ and Vulkan.**
+**A simple Game Engine built with C++ and Vulkan.**
 
 ![C++](https://img.shields.io/badge/C++-20-blue.svg)
 ![Vulkan](https://img.shields.io/badge/Vulkan-1.3-red.svg)
@@ -25,8 +25,8 @@
 Run this command to clone the repository and navigate to it:
 
 ```bash
-git clone https://github.com/ChocoYT/Vulkan-Engine
-cd Vulkan-Engine
+git clone https://github.com/Choco8767/Game-Engine
+cd Game-Engine
 ```
 
 <br>
@@ -50,37 +50,17 @@ Now configure and install dependencies for the project.
 Then, via Command Palette:
 
 - Press `CTRL + Shift + P` to open Command Palette
-- Run `CMake: Select Configure Preset` and pick `VCPKG Ninja`
+- Run `CMake: Select Configure Preset` and pick `x64 Release` (or x86, depending on your architecture)
 - Run `CMake: Configure`
 
 <br>
 
 Or, via Command Line:
 
-- Press `CTRL + '` to open Terminal
-- Run `cmake --preset vcpkg`
+- Open Specifically your `Developer PowerShell for VS` in the `Root Project Directory`
+- Run `cmake --list-presets`
+- Run `cmake --preset x64-release` (or x86, depending on your architecture)
 
-<br>
-
-If you see include errors, you may need to change your `C/C++ Configurations`:
-
-- Press CTRL + Shift + P
-- Run `C/C++ Edit Configurations (JSON)`
-- If on Windows, replace the JSON with:
-
-```json
-{
-    "configurations": [
-        {
-            "name": "Win32",
-            "configurationProvider": "ms-vscode.cmake-tools",
-            "intelliSenseMode": "windows-msvc-x64",
-            "cppStandard": "c++20"
-        }
-    ],
-    "version": 4
-}
-```
 
 <br>
 
@@ -90,11 +70,11 @@ Run these commands in order to build the project for both configurations:
 
 ```bash
 # Build and Install (Release)
-cmake --build build --config Release --target install
+cmake --build out/build/x64-release --target install
 ```
 ```bash
 # Build and Install (Debug)
-cmake --build build --config Debug --target install
+cmake --build out/build/x64-debug --target install
 ```
 
 <br>
@@ -106,9 +86,13 @@ cmake --build build --config Debug --target install
 Assuming you are in the root of the project:
 
 ```bash
-cd install/Release
+# 64-Bit Architecture
+cd out/install/x64-release
 
-./Vulkan-Engine
+# 32-Bit Architecture
+# cd out/install/x86-release
+
+./Game-Engine.exe  # OS Dependent
 ```
 
 <br>
@@ -118,7 +102,11 @@ cd install/Release
 Assuming you are in the root of the project:
 
 ```bash
-cd install/Debug
+# 64-Bit Architecture
+cd out/install/x64-debug
 
-./Vulkan-Engine
+# 32-Bit Architecture
+# cd out/install/x86-debug
+
+./Game-Engine.exe  # OS Dependent
 ```
