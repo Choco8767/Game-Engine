@@ -9,36 +9,6 @@
 
 namespace Engine::Vulkan {
 
-QueueFamilyIndices FindQueueFamilies(VkSurfaceKHR vkSurface, VkPhysicalDevice vkPhysicalDevice)
-{
-    QueueFamilyIndices indices;
-
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, nullptr);
-
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
-
-    int i = 0;
-    for (const auto &queueFamily : queueFamilies) {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-            indices.graphicsFamily = i;
-
-        VkBool32 hasPresentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, vkSurface, &hasPresentSupport);
-
-        if (hasPresentSupport)
-            indices.presentFamily = i;
-
-        if (indices.IsComplete())
-            break;
-
-        i++;
-    }
-
-    return indices;
-}
-
 VkPhysicalDeviceProperties GetDeviceProperties(VkPhysicalDevice vkPhysicalDevice)
 {
     VkPhysicalDeviceProperties properties;
@@ -92,32 +62,89 @@ bool CheckRequiredDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice, cons
     return requiredExtensions.empty();
 }
 
+QueueFamilyIndices FindQueueFamilies(VkSurfaceKHR vkSurface, VkPhysicalDevice vkPhysicalDevice)
+{
+    QueueFamilyIndices indices;
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto &queueFamily : queueFamilies) {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            indices.graphicsFamily = i;
+
+        VkBool32 hasPresentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, vkSurface, &hasPresentSupport);
+
+        if (hasPresentSupport)
+            indices.presentFamily = i;
+
+        if (indices.IsComplete())
+            break;
+
+        i++;
+    }
+
+    return indices;
+}
+
 SwapchainSupportDetails QuerySwapchainSupport(VkSurfaceKHR vkSurface, VkPhysicalDevice vkPhysicalDevice)
 {
     SwapchainSupportDetails details;
 
     // Capabilities
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, vkSurface, &details.capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+        vkPhysicalDevice,
+        vkSurface,
+        &details.capabilities);
 
     // Formats
     uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &formatCount, nullptr);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(
+        vkPhysicalDevice,
+        vkSurface,
+        &formatCount, nullptr);
 
     if (formatCount != 0) {
         details.formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &formatCount, details.formats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(
+            vkPhysicalDevice,
+            vkSurface,
+            &formatCount,
+            details.formats.data());
     }
 
     // Present Modes
     uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, vkSurface, &presentModeCount, nullptr);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(
+        vkPhysicalDevice,
+        vkSurface,
+        &presentModeCount, nullptr);
 
     if (presentModeCount != 0) {
         details.presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, vkSurface, &presentModeCount, details.presentModes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(
+            vkPhysicalDevice,
+            vkSurface,
+            &presentModeCount,
+            details.presentModes.data());
     }
 
     return details;
+}
+
+QueueFamilyIndices FindQueueFamilies(Surface surface, PhysicalDevice physicalDevice)
+{
+    return FindQueueFamilies(surface.handle, physicalDevice.handle);
+}
+
+SwapchainSupportDetails QuerySwapchainSupport(Surface surface, PhysicalDevice physicalDevice)
+{
+    return QuerySwapchainSupport(surface.handle, physicalDevice.handle);
 }
 
 std::optional<PhysicalDevice> CreatePhysicalDevice(

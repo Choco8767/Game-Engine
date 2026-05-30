@@ -15,7 +15,7 @@ public:
     virtual void Init(Window &window) = 0;
     virtual void Destroy() = 0;
 
-    virtual void Draw() = 0;
+    virtual void Draw(const Window &window) = 0;
 };
 
 std::unique_ptr<Renderer> CreateRenderer(GraphicsAPI api, Window &window);

@@ -21,16 +21,24 @@ public:
 
     void Destroy() override;
 
-    void PollEvents() override;
+    void Update() override;
 
     bool ShouldClose() const override;
-    int GetWidth() const override;
-    int GetHeight() const override;
+    bool HasResized() const override;
+
+    int GetFramebufferWidth() const override;
+    int GetFramebufferHeight() const override;
+    WindowFramebufferSize GetFramebufferSize() const override;
 
     std::vector<const char *> GetRequiredInstanceExtensions() const override;
 
 private:
     GLFWwindow *m_handle;
+
+    bool m_hasResized = false;
+
+    WindowFramebufferSize m_currentFramebufferSize { };
+    WindowFramebufferSize m_lastFramebufferSize { };
 };
 
 }

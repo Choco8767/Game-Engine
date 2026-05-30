@@ -20,7 +20,6 @@ bool WindowBackend::Init(
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     m_handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
@@ -48,9 +47,13 @@ void WindowBackend::Destroy()
     glfwTerminate();
 }
 
-void WindowBackend::PollEvents()
+void WindowBackend::Update()
 {
     glfwPollEvents();
+
+    m_lastFramebufferSize = m_currentFramebufferSize;
+
+    m_currentFramebufferSize = GetFramebufferSize();
 }
 
 bool WindowBackend::ShouldClose() const
@@ -58,20 +61,30 @@ bool WindowBackend::ShouldClose() const
     return glfwWindowShouldClose(m_handle);
 }
 
-int WindowBackend::GetWidth() const
+bool WindowBackend::HasResized() const
 {
-    int width;
-    glfwGetWindowSize(m_handle, &width, nullptr);
+    if (m_currentFramebufferSize.width != m_lastFramebufferSize.width)
+        return true;
 
-    return width;
+    if (m_currentFramebufferSize.height != m_lastFramebufferSize.height)
+        return true;
+
+    return false;
 }
 
-int WindowBackend::GetHeight() const
-{
-    int height;
-    glfwGetWindowSize(m_handle, nullptr, &height);
+int WindowBackend::GetFramebufferWidth() const { return GetFramebufferSize().width; }
+int WindowBackend::GetFramebufferHeight() const { return GetFramebufferSize().height; }
 
-    return height;
+WindowFramebufferSize WindowBackend::GetFramebufferSize() const
+{
+    int width = INT_MAX;
+    int height = INT_MAX;
+    glfwGetFramebufferSize(m_handle, &width, &height);
+
+    return WindowFramebufferSize {
+        .width = width,
+        .height = height
+    };
 }
 
 std::vector<const char *> WindowBackend::GetRequiredInstanceExtensions() const

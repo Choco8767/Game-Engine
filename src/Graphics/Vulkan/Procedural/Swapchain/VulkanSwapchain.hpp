@@ -32,12 +32,40 @@ struct Swapchain {
     std::vector<Framebuffer> framebuffers;
 };
 
+struct AcquireNextSwapchainImageResult {
+    uint32_t imageIndex;
+    VkResult result;
+
+    bool NeedsRecreation() const
+    {
+        return result == VK_ERROR_OUT_OF_DATE_KHR;
+    }
+};
+
+struct PresentSwapchainImageResult {
+    VkResult result;
+
+    bool NeedsRecreation() const
+    {
+        return result == VK_ERROR_OUT_OF_DATE_KHR
+            || result == VK_SUBOPTIMAL_KHR;
+    }
+};
+
 std::optional<Swapchain> CreateSwapchain(
     const Engine::Window &window,
     const Surface &surface,
     const PhysicalDevice &physicalDevice,
     const LogicalDevice &logicalDevice);
 void DestroySwapchain(VkDevice vkDevice, Swapchain &swapchain);
+
+void RecreateSwapchain(
+    const Engine::Window &window,
+    const Surface &surface,
+    PhysicalDevice &physicalDevice,
+    const LogicalDevice &logicalDevice,
+    const RenderPass &renderPass,
+    Swapchain &swapchain);
 
 void InitSwapchainImageViews(
     const LogicalDevice &logicalDevice,
@@ -47,14 +75,14 @@ void InitSwapchainFramebuffers(
     const RenderPass &renderPass,
     Swapchain &swapchain);
 
-uint32_t AquireNextSwapchainImage(
+AcquireNextSwapchainImageResult AcquireNextSwapchainImage(
     const LogicalDevice &logicalDevice,
     const Semaphore &imageAvailable,
     Swapchain &swapchain);
 
-void PresentSwapchainImage(
+PresentSwapchainImageResult PresentSwapchainImage(
     VkQueue vkPresentQueue,
     const Swapchain &swapchain,
     uint32_t imageIndex,
-    Semaphore renderFinished);
+    const Semaphore &renderFinished);
 }

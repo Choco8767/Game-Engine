@@ -27,4 +27,7 @@ std::optional<PhysicalDevice> CreatePhysicalDevice(
     const Surface &surface);
 void DestroyPhysicalDevice(PhysicalDevice &physicalDevice);
 
+QueueFamilyIndices FindQueueFamilies(Surface surface, PhysicalDevice physicalDevice);
+SwapchainSupportDetails QuerySwapchainSupport(Surface surface, PhysicalDevice physicalDevice);
+
 }

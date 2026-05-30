@@ -36,9 +36,11 @@ public:
     void Init(Window &window) override;
     void Destroy() override;
 
-    void Draw() override;
+    void Draw(const Window &window) override;
 
 private:
+    void TriggerSwapchainRecreation(const Window &window);
+
     Instance m_instance;
     Surface m_surface;
     PhysicalDevice m_physicalDevice;

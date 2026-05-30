@@ -4,6 +4,8 @@
 
 #include <optional>
 
+#include <iostream> // DELETE AFTER
+
 namespace Engine::Vulkan {
 
 RendererBackend::~RendererBackend()
@@ -69,20 +71,43 @@ void RendererBackend::Init(Window &window)
     }
 }
 
-void RendererBackend::Draw()
+void RendererBackend::TriggerSwapchainRecreation(const Window &window)
+{
+    m_physicalDevice.swapchainSupport = Vulkan::QuerySwapchainSupport(m_surface, m_physicalDevice);
+
+    Vulkan::RecreateSwapchain(
+        window,
+        m_surface,
+        m_physicalDevice,
+        m_logicalDevice,
+        m_renderPass,
+        m_swapchain);
+}
+
+void RendererBackend::Draw(const Window &window)
 {
     FrameData &currentFrame = m_frames[m_currentFrame];
 
     Vulkan::WaitForFence(m_logicalDevice, currentFrame.inFlightFence);
-    Vulkan::ResetFence(m_logicalDevice, currentFrame.inFlightFence);
 
-    uint32_t swapchainImage = Vulkan::AquireNextSwapchainImage(m_logicalDevice, currentFrame.imageAvailableSemaphore, m_swapchain);
+    if (window.HasResized()) {
+        TriggerSwapchainRecreation(window);
+        return;
+    }
+
+    auto acquireImageResult = Vulkan::AcquireNextSwapchainImage(m_logicalDevice, currentFrame.imageAvailableSemaphore, m_swapchain);
+    if (acquireImageResult.NeedsRecreation()) {
+        TriggerSwapchainRecreation(window);
+        return;
+    }
+
+    Vulkan::ResetFence(m_logicalDevice, currentFrame.inFlightFence);
 
     Vulkan::BeginCommandBuffer(currentFrame.commandBuffer);
     Vulkan::BeginRenderPass(
         currentFrame.commandBuffer,
         m_renderPass,
-        m_swapchain.framebuffers[m_currentFrame],
+        m_swapchain.framebuffers[acquireImageResult.imageIndex],
         m_swapchain.extent);
     Vulkan::BindPipeline(
         currentFrame.commandBuffer,
@@ -99,11 +124,16 @@ void RendererBackend::Draw()
         currentFrame.renderFinishedSemaphore,
         currentFrame.inFlightFence);
 
-    Vulkan::PresentSwapchainImage(
+    auto presentImageResult = Vulkan::PresentSwapchainImage(
         m_logicalDevice.presentQueue,
         m_swapchain,
-        swapchainImage,
+        acquireImageResult.imageIndex,
         currentFrame.renderFinishedSemaphore);
+
+    if (presentImageResult.NeedsRecreation()) {
+        TriggerSwapchainRecreation(window);
+        return;
+    }
 
     m_currentFrame = (m_currentFrame + 1) % m_frames.size();
 }

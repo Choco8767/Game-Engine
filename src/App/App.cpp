@@ -23,8 +23,7 @@ void App::Init()
 void App::Loop()
 {
     while (!m_window->ShouldClose()) {
-        m_window->PollEvents();
-
-        m_renderer->Draw();
+        m_window->Update();
+        m_renderer->Draw(*m_window);
     }
 }

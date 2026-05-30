@@ -44,8 +44,8 @@ VkExtent2D ChooseSwapchainExtent(const Engine::Window &window, const VkSurfaceCa
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
         return capabilities.currentExtent;
 
-    int width = window.GetWidth();
-    int height = window.GetHeight();
+    int width = window.GetFramebufferWidth();
+    int height = window.GetFramebufferHeight();
 
     VkExtent2D actualExtent = {
         static_cast<uint32_t>(width),
@@ -132,11 +132,11 @@ std::optional<Swapchain> CreateSwapchain(
 
 void DestroySwapchain(VkDevice vkDevice, Swapchain &swapchain)
 {
-    for (auto framebuffer : swapchain.framebuffers) {
+    for (auto &framebuffer : swapchain.framebuffers) {
         DestroyFramebuffer(vkDevice, framebuffer);
     }
 
-    for (auto imageView : swapchain.imageViews) {
+    for (auto &imageView : swapchain.imageViews) {
         if (imageView == VK_NULL_HANDLE)
             continue;
 
@@ -148,6 +148,30 @@ void DestroySwapchain(VkDevice vkDevice, Swapchain &swapchain)
         vkDestroySwapchainKHR(vkDevice, swapchain.handle, nullptr);
         swapchain.handle = VK_NULL_HANDLE;
     }
+}
+
+void RecreateSwapchain(
+    const Engine::Window &window,
+    const Surface &surface,
+    PhysicalDevice &physicalDevice,
+    const LogicalDevice &logicalDevice,
+    const RenderPass &renderPass,
+    Swapchain &swapchain)
+{
+    physicalDevice.swapchainSupport = QuerySwapchainSupport(surface, physicalDevice);
+
+    WaitIdle(logicalDevice);
+
+    Vulkan::DestroySwapchain(logicalDevice.handle, swapchain);
+
+    std::optional<Swapchain> optSwapchain = CreateSwapchain(window, surface, physicalDevice, logicalDevice);
+    if (!optSwapchain.has_value())
+        return;
+
+    swapchain = optSwapchain.value();
+
+    InitSwapchainImageViews(logicalDevice, swapchain);
+    InitSwapchainFramebuffers(logicalDevice, renderPass, swapchain);
 }
 
 void InitSwapchainImageViews(
@@ -208,22 +232,25 @@ void InitSwapchainFramebuffers(
     }
 }
 
-uint32_t AquireNextSwapchainImage(
+AcquireNextSwapchainImageResult AcquireNextSwapchainImage(
     const LogicalDevice &logicalDevice,
     const Semaphore &imageAvailable,
     Swapchain &swapchain)
 {
     uint32_t imageIndex = UINT32_MAX;
-    vkAcquireNextImageKHR(logicalDevice.handle, swapchain.handle, UINT64_MAX, imageAvailable.handle, VK_NULL_HANDLE, &imageIndex);
+    VkResult vkResult = vkAcquireNextImageKHR(logicalDevice.handle, swapchain.handle, UINT64_MAX, imageAvailable.handle, VK_NULL_HANDLE, &imageIndex);
 
-    return imageIndex;
+    return AcquireNextSwapchainImageResult {
+        .imageIndex = imageIndex,
+        .result = vkResult
+    };
 }
 
-void PresentSwapchainImage(
+PresentSwapchainImageResult PresentSwapchainImage(
     VkQueue vkPresentQueue,
     const Swapchain &swapchain,
     uint32_t imageIndex,
-    Semaphore renderFinished)
+    const Semaphore &renderFinished)
 {
     std::array<VkSemaphore, 1> signalSemaphores = { renderFinished.handle };
     std::array<VkSwapchainKHR, 1> swapchains = { swapchain.handle };
@@ -237,7 +264,14 @@ void PresentSwapchainImage(
         .pImageIndices = &imageIndex
     };
 
-    vkQueuePresentKHR(vkPresentQueue, &vkPresentInfo);
+    VkResult vkResult = vkQueuePresentKHR(vkPresentQueue, &vkPresentInfo);
+    if (vkResult != VK_SUCCESS) {
+        std::cerr << "Failed to Submit Swapchain Image to Present Queue. Error Code: " << vkResult << "\n";
+    }
+
+    return PresentSwapchainImageResult {
+        .result = vkResult
+    };
 }
 
 }
