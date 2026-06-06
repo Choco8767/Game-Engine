@@ -5,9 +5,9 @@
 
 #include "../Window.hpp"
 
-namespace Engine::GLFW {
+namespace Engine::Window::GLFW {
 
-class WindowBackend final : public Engine::Window {
+class WindowBackend final : public Engine::Window::Window {
 public:
     WindowBackend() = default;
     ~WindowBackend() override;
@@ -17,7 +17,7 @@ public:
         int height,
         const char *title) override;
 
-    std::optional<VkSurfaceKHR> CreateVulkanWindowSurface(VkInstance vkInstance) override;
+    VkSurfaceKHR CreateVulkanWindowSurface(VkInstance vkInstance) override;
 
     void Destroy() override;
 

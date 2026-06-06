@@ -1,11 +1,12 @@
 #include "VulkanInstance.hpp"
 
-#include <cstring>
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "VulkanConstants.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance,
@@ -43,11 +44,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
     return VK_FALSE;
 }
 
-std::optional<DebugMessenger> CreateDebugMessenger(const Instance &instance)
+DebugMessenger CreateDebugMessenger(const Instance &instance)
 {
-    if (!ENABLE_VALIDATION_LAYERS)
-        return std::nullopt;
-
     VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo { };
     if (ENABLE_VALIDATION_LAYERS) {
         vkDebugMessengerCreateInfo = PopulateDebugMessengerCreateInfo();
@@ -56,10 +54,8 @@ std::optional<DebugMessenger> CreateDebugMessenger(const Instance &instance)
     VkDebugUtilsMessengerEXT handle = VK_NULL_HANDLE;
 
     VkResult vkResult = CreateDebugUtilsMessengerEXT(instance.handle, &vkDebugMessengerCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Debug Messenger. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Debug Messenger. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Debug Messenger Created Successfully.\n";
 

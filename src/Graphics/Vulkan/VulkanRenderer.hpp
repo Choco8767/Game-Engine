@@ -18,7 +18,9 @@
 #include "Procedural/Sync/VulkanFence.hpp"
 #include "Procedural/Sync/VulkanSemaphore.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
+
+class ContextBackend;
 
 struct FrameData {
     CommandBuffer commandBuffer { };
@@ -28,29 +30,39 @@ struct FrameData {
     Fence inFlightFence { };
 };
 
-class RendererBackend final : public Engine::Renderer {
+class RendererBackend final : public Engine::Graphics::Renderer {
 public:
-    RendererBackend() = default;
+    RendererBackend(const ContextBackend &context);
     ~RendererBackend() override;
 
-    void Init(Window &window) override;
+    void Init(Engine::Window::Window &window) override;
     void Destroy() override;
 
-    void Draw(const Window &window) override;
+    bool BeginFrame(const Engine::Window::Window &window) override;
+    void EndFrame(const Engine::Window::Window &window) override;
+
+    void DrawMesh(
+        const Allocator &allocator,
+        BufferHandle vertexBuffer,
+        BufferHandle indexBuffer,
+        uint32_t indexCount,
+        uint32_t instanceCount,
+        uint32_t firstIndex,
+        int32_t vertexOffset,
+        uint32_t firstInstance) override;
 
 private:
-    void TriggerSwapchainRecreation(const Window &window);
+    void TriggerSwapchainRecreation(const Engine::Window::Window &window);
 
-    Instance m_instance;
-    Surface m_surface;
-    PhysicalDevice m_physicalDevice;
-    LogicalDevice m_logicalDevice;
+    const ContextBackend &m_context;
+
     Swapchain m_swapchain;
     RenderPass m_renderPass;
     GraphicsPipeline m_graphicsPipeline;
     CommandPool m_commandPool;
 
     std::vector<FrameData> m_frames;
+    uint32_t m_imageIndex = 0;
     uint32_t m_currentFrame = 0;
 };
 

@@ -7,7 +7,7 @@
 
 #include "VulkanDebugMessenger.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 struct Instance {
     VkInstance handle = VK_NULL_HANDLE;
@@ -15,7 +15,7 @@ struct Instance {
     std::optional<DebugMessenger> debugMessenger = std::nullopt;
 };
 
-std::optional<Instance> CreateInstance(const std::vector<const char *> &requiredExtensions);
+Instance CreateInstance(const std::vector<const char *> &requiredExtensions);
 void DestroyInstance(Instance &instance);
 
 }

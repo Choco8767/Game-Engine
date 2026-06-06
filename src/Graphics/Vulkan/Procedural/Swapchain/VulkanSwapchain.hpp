@@ -1,19 +1,18 @@
 #pragma once
 
-#include <optional>
 #include <vector>
 
 #include <vulkan/vulkan.h>
 
 #include "../Rendering/VulkanFramebuffer.hpp"
 
-namespace Engine {
+namespace Engine::Window {
 
 class Window;
 
 }
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 struct Surface;
 struct PhysicalDevice;
@@ -52,17 +51,17 @@ struct PresentSwapchainImageResult {
     }
 };
 
-std::optional<Swapchain> CreateSwapchain(
-    const Engine::Window &window,
+Swapchain CreateSwapchain(
+    const Engine::Window::Window &window,
     const Surface &surface,
     const PhysicalDevice &physicalDevice,
     const LogicalDevice &logicalDevice);
 void DestroySwapchain(VkDevice vkDevice, Swapchain &swapchain);
 
 void RecreateSwapchain(
-    const Engine::Window &window,
+    const Engine::Window::Window &window,
     const Surface &surface,
-    PhysicalDevice &physicalDevice,
+    const PhysicalDevice &physicalDevice,
     const LogicalDevice &logicalDevice,
     const RenderPass &renderPass,
     Swapchain &swapchain);

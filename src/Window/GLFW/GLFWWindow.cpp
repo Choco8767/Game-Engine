@@ -1,8 +1,10 @@
 #include "GLFWWindow.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
-namespace Engine::GLFW {
+namespace Engine::Window::GLFW {
 
 WindowBackend::~WindowBackend()
 {
@@ -26,15 +28,13 @@ bool WindowBackend::Init(
     return true;
 }
 
-std::optional<VkSurfaceKHR> WindowBackend::CreateVulkanWindowSurface(VkInstance vkInstance)
+VkSurfaceKHR WindowBackend::CreateVulkanWindowSurface(VkInstance vkInstance)
 {
     VkSurfaceKHR surface = VK_NULL_HANDLE;
 
     VkResult vkResult = glfwCreateWindowSurface(vkInstance, m_handle, nullptr, &surface);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Window Surface. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Window Surface. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Window Surface Created Successfully.\n";
 

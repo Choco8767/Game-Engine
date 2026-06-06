@@ -4,7 +4,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 struct SwapchainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;

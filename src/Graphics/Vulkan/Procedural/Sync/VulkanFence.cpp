@@ -1,12 +1,14 @@
 #include "VulkanFence.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<Fence> CreateFence(const LogicalDevice &logicalDevice, bool signaled)
+Fence CreateFence(const LogicalDevice &logicalDevice, bool signaled)
 {
     VkFenceCreateInfo vkFenceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
@@ -18,10 +20,8 @@ std::optional<Fence> CreateFence(const LogicalDevice &logicalDevice, bool signal
     VkFence handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateFence(logicalDevice.handle, &vkFenceCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Fence. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Fence. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Fence Created Successfully.\n";
 

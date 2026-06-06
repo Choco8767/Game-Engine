@@ -1,21 +1,24 @@
 #include "VulkanLogicalDevice.hpp"
 
+#include <format>
 #include <iostream>
 #include <set>
+#include <stdexcept>
 #include <vector>
 
 #include "VulkanConfig.hpp"
 #include "VulkanPhysicalDevice.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<LogicalDevice> CreateLogicalDevice(const PhysicalDevice &physicalDevice)
+LogicalDevice CreateLogicalDevice(const PhysicalDevice &physicalDevice)
 {
     float queuePriority = 1.0f;
 
     std::set<uint32_t> uniqueQueueFamilies = {
         physicalDevice.queueFamilyIndices.graphicsFamily.value(),
-        physicalDevice.queueFamilyIndices.presentFamily.value()
+        physicalDevice.queueFamilyIndices.presentFamily.value(),
+        physicalDevice.queueFamilyIndices.transferFamily.value()
     };
 
     std::vector<VkDeviceQueueCreateInfo> vkQueueCreateInfos;
@@ -32,35 +35,38 @@ std::optional<LogicalDevice> CreateLogicalDevice(const PhysicalDevice &physicalD
         vkQueueCreateInfos.emplace_back(vkQueueCreateInfo);
     }
 
+    auto vkPhysicalDeviceFeatures = GetPhysicalDeviceFeatures(physicalDevice);
+
     VkDeviceCreateInfo vkDeviceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .queueCreateInfoCount = static_cast<uint32_t>(vkQueueCreateInfos.size()),
         .pQueueCreateInfos = vkQueueCreateInfos.data(),
         .enabledExtensionCount = static_cast<uint32_t>(DEVICE_EXTENSIONS.size()),
         .ppEnabledExtensionNames = DEVICE_EXTENSIONS.data(),
-        .pEnabledFeatures = &physicalDevice.deviceFeatures
+        .pEnabledFeatures = &vkPhysicalDeviceFeatures
     };
 
     VkDevice handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateDevice(physicalDevice.handle, &vkDeviceCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Logical Device. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Logical Device. Error Code: {}", static_cast<int>(vkResult)));
 
     VkQueue vkGraphicsQueue = VK_NULL_HANDLE;
-    vkGetDeviceQueue(handle, physicalDevice.queueFamilyIndices.graphicsFamily.value(), 0, &vkGraphicsQueue);
-
     VkQueue vkPresentQueue = VK_NULL_HANDLE;
+    VkQueue vkTransferQueue = VK_NULL_HANDLE;
+
+    vkGetDeviceQueue(handle, physicalDevice.queueFamilyIndices.graphicsFamily.value(), 0, &vkGraphicsQueue);
     vkGetDeviceQueue(handle, physicalDevice.queueFamilyIndices.presentFamily.value(), 0, &vkPresentQueue);
+    vkGetDeviceQueue(handle, physicalDevice.queueFamilyIndices.transferFamily.value(), 0, &vkTransferQueue);
 
     std::cout << "Vulkan Logical Device Created Successfully.\n";
 
     return LogicalDevice {
         .handle = handle,
         .graphicsQueue = vkGraphicsQueue,
-        .presentQueue = vkPresentQueue
+        .presentQueue = vkPresentQueue,
+        .transferQueue = vkTransferQueue
     };
 }
 

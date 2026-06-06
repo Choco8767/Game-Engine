@@ -1,10 +1,8 @@
 #pragma once
 
-#include <optional>
-
 #include <vulkan/vulkan.h>
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 struct PhysicalDevice;
 
@@ -13,9 +11,10 @@ struct LogicalDevice {
 
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue presentQueue = VK_NULL_HANDLE;
+    VkQueue transferQueue = VK_NULL_HANDLE;
 };
 
-std::optional<LogicalDevice> CreateLogicalDevice(const PhysicalDevice &physicalDevice);
+LogicalDevice CreateLogicalDevice(const PhysicalDevice &physicalDevice);
 void DestroyLogicalDevice(LogicalDevice &logicaldevice);
 
 void WaitIdle(const LogicalDevice &logicalDevice);

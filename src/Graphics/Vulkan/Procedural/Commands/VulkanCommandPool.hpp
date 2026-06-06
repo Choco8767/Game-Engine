@@ -1,21 +1,18 @@
 #pragma once
 
-#include <optional>
+#include <cstdint>
 
 #include <vulkan/vulkan.h>
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-struct PhysicalDevice;
 struct LogicalDevice;
 
 struct CommandPool {
     VkCommandPool handle = VK_NULL_HANDLE;
 };
 
-std::optional<CommandPool> CreateCommandPool(
-    const PhysicalDevice &physicalDevice,
-    const LogicalDevice &logicalDevice);
+CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, uint32_t queueFamilyIndex);
 void DestroyCommandPool(VkDevice vkDevice, CommandPool &commandPool);
 
 }

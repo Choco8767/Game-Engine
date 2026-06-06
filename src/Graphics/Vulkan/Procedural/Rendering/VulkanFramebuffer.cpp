@@ -1,14 +1,16 @@
 #include "VulkanFramebuffer.hpp"
 
 #include <cstdint>
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
 #include "VulkanRenderPass.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<Framebuffer> CreateFramebuffer(
+Framebuffer CreateFramebuffer(
     const LogicalDevice &logicalDevice,
     const RenderPass &renderPass,
     const VkExtent2D &extent,
@@ -27,10 +29,8 @@ std::optional<Framebuffer> CreateFramebuffer(
     VkFramebuffer handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateFramebuffer(logicalDevice.handle, &vkFramebufferCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Framebuffer. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Framebuffer. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Framebuffer Created Successfully.\n";
 

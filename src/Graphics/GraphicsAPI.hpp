@@ -1,8 +1,8 @@
 #pragma once
 
-namespace Engine {
+namespace Engine::Graphics {
 
-enum class GraphicsAPI {
+enum class API {
     VULKAN
 };
 

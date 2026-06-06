@@ -1,16 +1,14 @@
 #pragma once
 
-#include <optional>
-
 #include <vulkan/vulkan.h>
 
-namespace Engine {
+namespace Engine::Window {
 
 class Window;
 
 }
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 struct Instance;
 
@@ -18,7 +16,7 @@ struct Surface {
     VkSurfaceKHR handle = VK_NULL_HANDLE;
 };
 
-std::optional<Surface> CreateSurface(const Instance &instance, Window &window);
+Surface CreateSurface(const Instance &instance, Engine::Window::Window &window);
 void DestroySurface(VkInstance vkInstance, Surface &surface);
 
 }

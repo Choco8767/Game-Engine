@@ -1,12 +1,14 @@
 #include "VulkanSemaphore.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<Semaphore> CreateSemaphore(const LogicalDevice &logicalDevice)
+Semaphore CreateSemaphore(const LogicalDevice &logicalDevice)
 {
     VkSemaphoreCreateInfo vkSemaphoreCreateInfo {
         .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
@@ -16,8 +18,7 @@ std::optional<Semaphore> CreateSemaphore(const LogicalDevice &logicalDevice)
 
     VkResult vkResult = vkCreateSemaphore(logicalDevice.handle, &vkSemaphoreCreateInfo, nullptr, &handle);
     if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Semaphore. Error Code: " << vkResult << "\n";
-        return std::nullopt;
+        throw std::runtime_error(std::format("Failed to Create Vulkan Semaphore. Error Code: {}", static_cast<int>(vkResult)));
     }
 
     std::cout << "Vulkan Semaphore Created Successfully.\n";

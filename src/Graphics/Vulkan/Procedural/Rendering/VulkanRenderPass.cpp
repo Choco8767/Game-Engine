@@ -1,13 +1,15 @@
 #include "VulkanRenderPass.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
 #include "../Swapchain/VulkanSwapchain.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<RenderPass> CreateRenderPass(const LogicalDevice &logicalDevice, const Swapchain &swapchain)
+RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Swapchain &swapchain)
 {
     std::vector<VkAttachmentDescription> vkColorAttachments = {
         {
@@ -60,10 +62,8 @@ std::optional<RenderPass> CreateRenderPass(const LogicalDevice &logicalDevice, c
     VkRenderPass handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateRenderPass(logicalDevice.handle, &vkRenderPassCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Render Pass. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Render Pass. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Render Pass Created Successfully.\n";
 

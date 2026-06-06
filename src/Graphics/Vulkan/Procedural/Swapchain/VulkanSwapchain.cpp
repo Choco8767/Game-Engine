@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <format>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <vector>
 
 #include "Window/Window.hpp"
@@ -15,7 +17,7 @@
 #include "../Rendering/VulkanRenderPass.hpp"
 #include "../Sync/VulkanSemaphore.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats)
 {
@@ -39,7 +41,7 @@ VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> 
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-VkExtent2D ChooseSwapchainExtent(const Engine::Window &window, const VkSurfaceCapabilitiesKHR &capabilities)
+VkExtent2D ChooseSwapchainExtent(const Engine::Window::Window &window, const VkSurfaceCapabilitiesKHR &capabilities)
 {
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
         return capabilities.currentExtent;
@@ -58,21 +60,23 @@ VkExtent2D ChooseSwapchainExtent(const Engine::Window &window, const VkSurfaceCa
     return actualExtent;
 }
 
-std::optional<Swapchain> CreateSwapchain(
-    const Engine::Window &window,
+Swapchain CreateSwapchain(
+    const Engine::Window::Window &window,
     const Surface &surface,
     const PhysicalDevice &physicalDevice,
     const LogicalDevice &logicalDevice)
 {
-    VkSurfaceFormatKHR vkSurfaceFormat = ChooseSwapchainSurfaceFormat(physicalDevice.swapchainSupport.formats);
-    VkPresentModeKHR vkPresentMode = ChooseSwapchainPresentMode(physicalDevice.swapchainSupport.presentModes);
-    VkExtent2D vkExtent = ChooseSwapchainExtent(window, physicalDevice.swapchainSupport.capabilities);
+    auto swapchainSupport = QuerySwapchainSupport(surface, physicalDevice);
 
-    uint32_t imageCount = physicalDevice.swapchainSupport.capabilities.minImageCount + 1;
+    VkSurfaceFormatKHR vkSurfaceFormat = ChooseSwapchainSurfaceFormat(swapchainSupport.formats);
+    VkPresentModeKHR vkPresentMode = ChooseSwapchainPresentMode(swapchainSupport.presentModes);
+    VkExtent2D vkExtent = ChooseSwapchainExtent(window, swapchainSupport.capabilities);
 
-    if (physicalDevice.swapchainSupport.capabilities.maxImageCount > 0
-        && imageCount > physicalDevice.swapchainSupport.capabilities.maxImageCount)
-        imageCount = physicalDevice.swapchainSupport.capabilities.maxImageCount;
+    uint32_t imageCount = swapchainSupport.capabilities.minImageCount + 1;
+
+    if (swapchainSupport.capabilities.maxImageCount > 0
+        && imageCount > swapchainSupport.capabilities.maxImageCount)
+        imageCount = swapchainSupport.capabilities.maxImageCount;
 
     VkSwapchainCreateInfoKHR vkSwapchainCreateInfo {
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -83,7 +87,7 @@ std::optional<Swapchain> CreateSwapchain(
         .imageExtent = vkExtent,
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-        .preTransform = physicalDevice.swapchainSupport.capabilities.currentTransform,
+        .preTransform = swapchainSupport.capabilities.currentTransform,
         .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
         .presentMode = vkPresentMode,
         .clipped = VK_TRUE,
@@ -108,10 +112,8 @@ std::optional<Swapchain> CreateSwapchain(
     VkSwapchainKHR handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateSwapchainKHR(logicalDevice.handle, &vkSwapchainCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Swapchain. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Swapchain. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Swapchain Created Successfully.\n";
 
@@ -151,14 +153,14 @@ void DestroySwapchain(VkDevice vkDevice, Swapchain &swapchain)
 }
 
 void RecreateSwapchain(
-    const Engine::Window &window,
+    const Engine::Window::Window &window,
     const Surface &surface,
-    PhysicalDevice &physicalDevice,
+    const PhysicalDevice &physicalDevice,
     const LogicalDevice &logicalDevice,
     const RenderPass &renderPass,
     Swapchain &swapchain)
 {
-    physicalDevice.swapchainSupport = QuerySwapchainSupport(surface, physicalDevice);
+    auto swapchainSupport = QuerySwapchainSupport(surface, physicalDevice);
 
     WaitIdle(logicalDevice);
 

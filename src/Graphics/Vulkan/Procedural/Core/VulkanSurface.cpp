@@ -3,15 +3,11 @@
 #include "VulkanInstance.hpp"
 #include "Window/Window.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<Surface> CreateSurface(const Instance &instance, Window &window)
+Surface CreateSurface(const Instance &instance, Window::Window &window)
 {
-    std::optional<VkSurfaceKHR> optHandle = window.CreateVulkanWindowSurface(instance.handle);
-    if (!optHandle.has_value())
-        return std::nullopt;
-
-    VkSurfaceKHR handle = optHandle.value();
+    VkSurfaceKHR handle = window.CreateVulkanWindowSurface(instance.handle);
 
     return Surface {
         .handle = handle

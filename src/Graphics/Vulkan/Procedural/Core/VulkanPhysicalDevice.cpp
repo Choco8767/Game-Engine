@@ -2,28 +2,13 @@
 
 #include <iostream>
 #include <set>
+#include <stdexcept>
 
 #include "VulkanConfig.hpp"
 #include "VulkanInstance.hpp"
 #include "VulkanSurface.hpp"
 
-namespace Engine::Vulkan {
-
-VkPhysicalDeviceProperties GetDeviceProperties(VkPhysicalDevice vkPhysicalDevice)
-{
-    VkPhysicalDeviceProperties properties;
-    vkGetPhysicalDeviceProperties(vkPhysicalDevice, &properties);
-
-    return properties;
-}
-
-VkPhysicalDeviceFeatures GetDeviceFeatures(VkPhysicalDevice vkPhysicalDevice)
-{
-    VkPhysicalDeviceFeatures deviceFeatures;
-    vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &deviceFeatures);
-
-    return deviceFeatures;
-}
+namespace Engine::Graphics::Vulkan {
 
 int RateDeviceSuitability(
     VkPhysicalDevice vkPhysicalDevice,
@@ -72,24 +57,46 @@ QueueFamilyIndices FindQueueFamilies(VkSurfaceKHR vkSurface, VkPhysicalDevice vk
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
-    int i = 0;
-    for (const auto &queueFamily : queueFamilies) {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+    for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+        if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             indices.graphicsFamily = i;
 
-        VkBool32 hasPresentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, vkSurface, &hasPresentSupport);
-
-        if (hasPresentSupport)
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, vkSurface, &presentSupport);
+        if (presentSupport)
             indices.presentFamily = i;
 
-        if (indices.IsComplete())
+        if (indices.graphicsFamily && indices.presentFamily)
             break;
-
-        i++;
     }
 
+    for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+        if ((queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT) && !(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
+            indices.transferFamily = i;
+            break;
+        }
+    }
+
+    if (!indices.transferFamily.has_value())
+        indices.transferFamily = indices.graphicsFamily;
+
     return indices;
+}
+
+VkPhysicalDeviceProperties GetPhysicalDeviceProperties(VkPhysicalDevice vkPhysicalDevice)
+{
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(vkPhysicalDevice, &properties);
+
+    return properties;
+}
+
+VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice vkPhysicalDevice)
+{
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceFeatures(vkPhysicalDevice, &deviceFeatures);
+
+    return deviceFeatures;
 }
 
 SwapchainSupportDetails QuerySwapchainSupport(VkSurfaceKHR vkSurface, VkPhysicalDevice vkPhysicalDevice)
@@ -137,9 +144,14 @@ SwapchainSupportDetails QuerySwapchainSupport(VkSurfaceKHR vkSurface, VkPhysical
     return details;
 }
 
-QueueFamilyIndices FindQueueFamilies(Surface surface, PhysicalDevice physicalDevice)
+VkPhysicalDeviceProperties GetPhysicalDeviceProperties(const PhysicalDevice &physicalDevice)
 {
-    return FindQueueFamilies(surface.handle, physicalDevice.handle);
+    return GetPhysicalDeviceProperties(physicalDevice.handle);
+}
+
+VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(const PhysicalDevice &physicalDevice)
+{
+    return GetPhysicalDeviceFeatures(physicalDevice.handle);
 }
 
 SwapchainSupportDetails QuerySwapchainSupport(Surface surface, PhysicalDevice physicalDevice)
@@ -147,17 +159,15 @@ SwapchainSupportDetails QuerySwapchainSupport(Surface surface, PhysicalDevice ph
     return QuerySwapchainSupport(surface.handle, physicalDevice.handle);
 }
 
-std::optional<PhysicalDevice> CreatePhysicalDevice(
+PhysicalDevice CreatePhysicalDevice(
     const Instance &instance,
     const Surface &surface)
 {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance.handle, &deviceCount, nullptr);
 
-    if (deviceCount == 0) {
-        std::cerr << "Failed to Find a GPU with Vulkan Support.\n";
-        return std::nullopt;
-    }
+    if (deviceCount == 0)
+        throw std::runtime_error("Failed to Find a GPU with Vulkan Support.");
 
     std::vector<VkPhysicalDevice> vkPhysicalDevices(deviceCount);
     vkEnumeratePhysicalDevices(instance.handle, &deviceCount, vkPhysicalDevices.data());
@@ -166,7 +176,6 @@ std::optional<PhysicalDevice> CreatePhysicalDevice(
     VkPhysicalDeviceProperties properties = { };
     VkPhysicalDeviceFeatures features = { };
     QueueFamilyIndices indices { };
-    SwapchainSupportDetails swapchainSupport { };
 
     int bestSuitability = -1;
 
@@ -183,8 +192,8 @@ std::optional<PhysicalDevice> CreatePhysicalDevice(
         if (!supportsAdequateSwapchain)
             continue;
 
-        VkPhysicalDeviceProperties currentProperties = GetDeviceProperties(vkPhysicalDevice);
-        VkPhysicalDeviceFeatures currentFeatures = GetDeviceFeatures(vkPhysicalDevice);
+        VkPhysicalDeviceProperties currentProperties = GetPhysicalDeviceProperties(vkPhysicalDevice);
+        VkPhysicalDeviceFeatures currentFeatures = GetPhysicalDeviceFeatures(vkPhysicalDevice);
         QueueFamilyIndices currentIndices = FindQueueFamilies(surface.handle, vkPhysicalDevice);
 
         int suitability = RateDeviceSuitability(vkPhysicalDevice, currentProperties, currentFeatures, currentIndices);
@@ -196,34 +205,25 @@ std::optional<PhysicalDevice> CreatePhysicalDevice(
             properties = currentProperties;
             features = currentFeatures;
             indices = currentIndices;
-            swapchainSupport = currentSwapchainSupport;
         }
     }
 
-    if (handle == VK_NULL_HANDLE) {
-        std::cerr << "Failed to Find a Suitable GPU.\n";
-        return std::nullopt;
-    }
+    if (handle == VK_NULL_HANDLE)
+        throw std::runtime_error("Failed to Find a Suitable GPU.");
 
     std::cout << "Vulkan Physical Device Selected Successfully.\n";
     std::cout << "\tSelected GPU: " << properties.deviceName << "\n";
 
     return PhysicalDevice {
         .handle = handle,
-        .deviceProperties = properties,
-        .deviceFeatures = features,
-        .queueFamilyIndices = indices,
-        .swapchainSupport = std::move(swapchainSupport)
+        .queueFamilyIndices = indices
     };
 }
 
 void DestroyPhysicalDevice(PhysicalDevice &physicalDevice)
 {
     physicalDevice.handle = VK_NULL_HANDLE;
-    physicalDevice.deviceProperties = { };
-    physicalDevice.deviceFeatures = { };
     physicalDevice.queueFamilyIndices = { };
-    physicalDevice.swapchainSupport = { };
 }
 
 }

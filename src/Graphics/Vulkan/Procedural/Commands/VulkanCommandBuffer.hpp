@@ -5,21 +5,26 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Engine::Vulkan {
+#include "../Sync/VulkanFence.hpp"
+#include "../Sync/VulkanSemaphore.hpp"
+
+#include "Graphics/Types/ResourceHandles.hpp"
+
+namespace Engine::Graphics::Vulkan {
+
+class AllocatorBackend;
 
 struct LogicalDevice;
 struct RenderPass;
 struct GraphicsPipeline;
 struct Framebuffer;
 struct CommandPool;
-struct Semaphore;
-struct Fence;
 
 struct CommandBuffer {
     VkCommandBuffer handle = VK_NULL_HANDLE;
 };
 
-std::optional<CommandBuffer> AllocateCommandBuffer(
+CommandBuffer AllocateCommandBuffer(
     const LogicalDevice &logicalDevice,
     const CommandPool &commandPool);
 void FreeCommandBuffer(
@@ -31,11 +36,12 @@ void BeginCommandBuffer(CommandBuffer &commandBuffer);
 void EndCommandBuffer(CommandBuffer &commandBuffer);
 
 void SubmitCommandBuffer(
-    VkQueue vkGraphicsQueue,
+    VkQueue vkQueue,
     const CommandBuffer &commandBuffer,
-    Semaphore imageAvailable,
-    Semaphore renderFinished,
-    Fence inFlight);
+    const std::optional<Semaphore> &waitSemaphore = std::nullopt,
+    const std::optional<VkPipelineStageFlags> &waitStage = std::nullopt,
+    const std::optional<Semaphore> &signalSemaphore = std::nullopt,
+    const std::optional<Fence> &fence = std::nullopt);
 
 void BeginRenderPass(
     CommandBuffer &commandBuffer,
@@ -48,6 +54,28 @@ void BindPipeline(
     CommandBuffer &commandBuffer,
     const GraphicsPipeline &graphicsPipeline,
     VkExtent2D extent);
+
+void CopyBuffer(
+    CommandBuffer &commandBuffer,
+    const AllocatorBackend &allocator,
+    BufferHandle source,
+    BufferHandle destination,
+    VkDeviceSize size);
+
+void BindVertexBuffer(
+    CommandBuffer &commandBuffer,
+    const AllocatorBackend &allocator,
+    BufferHandle buffer,
+    uint32_t firstBinding,
+    uint32_t bindingCount,
+    VkDeviceSize offset = 0);
+
+void BindIndexBuffer(
+    CommandBuffer &commandBuffer,
+    const AllocatorBackend &allocator,
+    BufferHandle buffer,
+    VkDeviceSize offset = 0,
+    VkIndexType indexType = VK_INDEX_TYPE_UINT32);
 
 void Draw(
     CommandBuffer &commandBuffer,

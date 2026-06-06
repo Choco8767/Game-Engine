@@ -1,19 +1,20 @@
 #include "VulkanCommandBuffer.hpp"
 
 #include <array>
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
+#include "../Commands/VulkanCommandPool.hpp"
 #include "../Core/VulkanLogicalDevice.hpp"
 #include "../Pipeline/VulkanGraphicsPipeline.hpp"
 #include "../Rendering/VulkanFramebuffer.hpp"
 #include "../Rendering/VulkanRenderPass.hpp"
-#include "../Sync/VulkanFence.hpp"
-#include "../Sync/VulkanSemaphore.hpp"
-#include "VulkanCommandPool.hpp"
+#include "Graphics/Vulkan/VulkanAllocator.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<CommandBuffer> AllocateCommandBuffer(
+CommandBuffer AllocateCommandBuffer(
     const LogicalDevice &logicalDevice,
     const CommandPool &commandPool)
 {
@@ -27,9 +28,8 @@ std::optional<CommandBuffer> AllocateCommandBuffer(
     VkCommandBuffer handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkAllocateCommandBuffers(logicalDevice.handle, &vkCommandBufferAllocateInfo, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Allocate Vulkan Command Buffers. Error Code: " << vkResult << "\n";
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Allocate Vulkan Command Buffers. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Command Buffer Allocated Successfully.\n";
 
@@ -70,30 +70,40 @@ void EndCommandBuffer(CommandBuffer &commandBuffer)
 }
 
 void SubmitCommandBuffer(
-    VkQueue vkGraphicsQueue,
+    VkQueue vkQueue,
     const CommandBuffer &commandBuffer,
-    Semaphore imageAvailable,
-    Semaphore renderFinished,
-    Fence inFlight)
+    const std::optional<Semaphore> &waitSemaphore,
+    const std::optional<VkPipelineStageFlags> &waitStage,
+    const std::optional<Semaphore> &signalSemaphore,
+    const std::optional<Fence> &fence)
 {
-    std::array<VkSemaphore, 1> signalSemaphores = { renderFinished.handle };
-    std::array<VkSemaphore, 1> waitSemaphores = { imageAvailable.handle };
-    std::array<VkPipelineStageFlags, 1> waitStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-
     VkSubmitInfo vkSubmitInfo {
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-        .waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size()),
-        .pWaitSemaphores = waitSemaphores.data(),
-        .pWaitDstStageMask = waitStages.data(),
         .commandBufferCount = 1,
-        .pCommandBuffers = &commandBuffer.handle,
-        .signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size()),
-        .pSignalSemaphores = signalSemaphores.data()
+        .pCommandBuffers = &commandBuffer.handle
     };
 
-    VkResult vkResult = vkQueueSubmit(vkGraphicsQueue, 1, &vkSubmitInfo, inFlight.handle);
+    if (waitSemaphore.has_value() && waitStage.has_value()) {
+        std::array<VkSemaphore, 1> waitSemaphores = { waitSemaphore->handle };
+        std::array<VkPipelineStageFlags, 1> waitStages = { waitStage.value() };
+
+        vkSubmitInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
+        vkSubmitInfo.pWaitSemaphores = &waitSemaphore->handle;
+        vkSubmitInfo.pWaitDstStageMask = &waitStage.value();
+    }
+
+    if (signalSemaphore.has_value()) {
+        std::array<VkSemaphore, 1> signalSemaphores = { signalSemaphore->handle };
+
+        vkSubmitInfo.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
+        vkSubmitInfo.pSignalSemaphores = &signalSemaphore->handle;
+    }
+
+    VkFence vkFence = fence.has_value() ? fence->handle : VK_NULL_HANDLE;
+
+    VkResult vkResult = vkQueueSubmit(vkQueue, 1, &vkSubmitInfo, vkFence);
     if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Submit Command Buffer to Graphics Queue. Error Code: " << vkResult << "\n";
+        std::cerr << "Failed to Submit Command Buffer to Queue. Error Code: " << vkResult << "\n";
     }
 }
 
@@ -148,6 +158,64 @@ void BindPipeline(
         .extent = extent
     };
     vkCmdSetScissor(commandBuffer.handle, 0, 1, &vkScissor);
+}
+
+void CopyBuffer(
+    CommandBuffer &commandBuffer,
+    const AllocatorBackend &allocator,
+    BufferHandle source,
+    BufferHandle destination,
+    VkDeviceSize size)
+{
+    VkBufferCopy vkCopyRegion {
+        .srcOffset = 0,
+        .dstOffset = 0,
+        .size = size
+    };
+
+    Buffer rawSourceBuffer = allocator.GetBuffer(source);
+    Buffer rawDestinationBuffer = allocator.GetBuffer(destination);
+
+    vkCmdCopyBuffer(
+        commandBuffer.handle,
+        rawSourceBuffer.handle,
+        rawDestinationBuffer.handle,
+        1,
+        &vkCopyRegion);
+}
+
+void BindVertexBuffer(
+    CommandBuffer &commandBuffer,
+    const AllocatorBackend &allocator,
+    BufferHandle buffer,
+    uint32_t firstBinding,
+    uint32_t bindingCount,
+    VkDeviceSize offset)
+{
+    Buffer rawBuffer = allocator.GetBuffer(buffer);
+
+    vkCmdBindVertexBuffers(
+        commandBuffer.handle,
+        firstBinding,
+        bindingCount,
+        &rawBuffer.handle,
+        &offset);
+}
+
+void BindIndexBuffer(
+    CommandBuffer &commandBuffer,
+    const AllocatorBackend &allocator,
+    BufferHandle buffer,
+    VkDeviceSize offset,
+    VkIndexType indexType)
+{
+    Buffer rawBuffer = allocator.GetBuffer(buffer);
+
+    vkCmdBindIndexBuffer(
+        commandBuffer.handle,
+        rawBuffer.handle,
+        offset,
+        indexType);
 }
 
 void Draw(

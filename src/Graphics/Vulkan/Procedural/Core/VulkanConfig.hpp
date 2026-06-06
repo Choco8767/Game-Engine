@@ -4,7 +4,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 inline const std::vector<const char *> DEVICE_EXTENSIONS = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME

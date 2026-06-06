@@ -1,41 +1,43 @@
 #include "VulkanGraphicsPipeline.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
 #include "../Rendering/VulkanRenderPass.hpp"
 
 #include "Utils/ReadFile.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<GraphicsPipeline> CreateGraphicsPipeline(
+GraphicsPipeline CreateGraphicsPipeline(
     const LogicalDevice &logicalDevice,
-    const RenderPass &renderPass)
+    const RenderPass &renderPass,
+    std::span<const VkVertexInputBindingDescription> vkVertexBindingDescriptions,
+    std::span<const VkVertexInputAttributeDescription> vkVertexAttributeDescriptions)
 {
     auto vertexShaderData = Utils::ReadFile("./shaders/Shader.vert.spv");
     auto fragmentShaderData = Utils::ReadFile("./shaders/Shader.frag.spv");
 
-    std::optional<ShaderModule> vertexShaderModule = CreateShaderModule(logicalDevice, vertexShaderData);
-    std::optional<ShaderModule> fragmentShaderModule = CreateShaderModule(logicalDevice, fragmentShaderData);
-
-    VkPipelineShaderStageCreateInfo vkVertexShaderStageCreateInfo {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = VK_SHADER_STAGE_VERTEX_BIT,
-        .module = vertexShaderModule->handle,
-        .pName = "main"
-    };
-
-    VkPipelineShaderStageCreateInfo vkFragmentShaderStageCreateInfo {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-        .module = fragmentShaderModule->handle,
-        .pName = "main"
-    };
+    ShaderModule vertexShaderModule = CreateShaderModule(logicalDevice, vertexShaderData);
+    ShaderModule fragmentShaderModule = CreateShaderModule(logicalDevice, fragmentShaderData);
 
     std::vector<VkPipelineShaderStageCreateInfo> vkShaderStageCreateInfos = {
-        vkVertexShaderStageCreateInfo,
-        vkFragmentShaderStageCreateInfo
+        {
+            // Vertex
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            .stage = VK_SHADER_STAGE_VERTEX_BIT,
+            .module = vertexShaderModule.handle,
+            .pName = "main",
+        },
+        {
+            // Fragment
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+            .module = fragmentShaderModule.handle,
+            .pName = "main",
+        }
     };
 
     std::vector<VkDynamicState> vkDynamicStates = {
@@ -51,10 +53,10 @@ std::optional<GraphicsPipeline> CreateGraphicsPipeline(
 
     VkPipelineVertexInputStateCreateInfo vkVertexInputCreateInfo {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .vertexBindingDescriptionCount = 0,
-        .pVertexBindingDescriptions = nullptr,
-        .vertexAttributeDescriptionCount = 0,
-        .pVertexAttributeDescriptions = nullptr
+        .vertexBindingDescriptionCount = static_cast<uint32_t>(vkVertexBindingDescriptions.size()),
+        .pVertexBindingDescriptions = vkVertexBindingDescriptions.data(),
+        .vertexAttributeDescriptionCount = static_cast<uint32_t>(vkVertexAttributeDescriptions.size()),
+        .pVertexAttributeDescriptions = vkVertexAttributeDescriptions.data()
     };
 
     VkPipelineInputAssemblyStateCreateInfo vkInputAssemblyCreateInfo {
@@ -107,10 +109,8 @@ std::optional<GraphicsPipeline> CreateGraphicsPipeline(
     VkPipelineLayout layout = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreatePipelineLayout(logicalDevice.handle, &vkPipelineLayoutCreateInfo, nullptr, &layout);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Pipeline Layout. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Pipeline Layout. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Graphics Pipeline Layout Created Successfully.\n";
 
@@ -133,26 +133,22 @@ std::optional<GraphicsPipeline> CreateGraphicsPipeline(
     VkPipeline handle = VK_NULL_HANDLE;
 
     vkResult = vkCreateGraphicsPipelines(logicalDevice.handle, VK_NULL_HANDLE, 1, &vkPipelineCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Graphics Pipeline. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Graphics Pipeline. Error Code: {}", static_cast<int>(vkResult)));
+
+    DestroyShaderModule(logicalDevice.handle, vertexShaderModule);
+    DestroyShaderModule(logicalDevice.handle, fragmentShaderModule);
 
     std::cout << "Vulkan Graphics Pipeline Created Successfully.\n";
 
     return GraphicsPipeline {
         .handle = handle,
-        .layout = layout,
-        .vertexShaderModule = vertexShaderModule,
-        .fragmentShaderModule = fragmentShaderModule
+        .layout = layout
     };
 }
 
 void DestroyGraphicsPipeline(VkDevice vkDevice, GraphicsPipeline &pipeline)
 {
-    DestroyShaderModule(vkDevice, pipeline.vertexShaderModule.value());
-    DestroyShaderModule(vkDevice, pipeline.fragmentShaderModule.value());
-
     if (pipeline.handle != VK_NULL_HANDLE) {
         vkDestroyPipeline(vkDevice, pipeline.handle, nullptr);
         pipeline.handle = VK_NULL_HANDLE;

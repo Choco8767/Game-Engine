@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 #ifdef NDEBUG
 constexpr bool ENABLE_VALIDATION_LAYERS = false;

@@ -1,29 +1,26 @@
 #include "VulkanCommandPool.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
-#include "../Core/VulkanPhysicalDevice.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<CommandPool> CreateCommandPool(
-    const PhysicalDevice &physicalDevice,
-    const LogicalDevice &logicalDevice)
+CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, uint32_t queueFamilyIndex)
 {
     VkCommandPoolCreateInfo vkCommandPoolCreateInfo {
         .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
         .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-        .queueFamilyIndex = physicalDevice.queueFamilyIndices.graphicsFamily.value()
+        .queueFamilyIndex = queueFamilyIndex
     };
 
     VkCommandPool handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateCommandPool(logicalDevice.handle, &vkCommandPoolCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Command Pool. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Command Pool. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Command Pool Created Successfully.\n";
 

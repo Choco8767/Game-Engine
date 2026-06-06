@@ -1,14 +1,20 @@
 #pragma once
 
-#include <cstdint>
 #include <memory>
 
 #include <vulkan/vulkan.h>
 
-namespace Engine {
+namespace Engine::Window {
 
 class Window;
+
+}
+
+namespace Engine::Graphics {
+
+class Context;
 class Renderer;
+class Allocator;
 
 }
 
@@ -23,6 +29,8 @@ private:
     void Init();
     void Loop();
 
-    std::unique_ptr<Engine::Window> m_window;
-    std::unique_ptr<Engine::Renderer> m_renderer;
+    std::unique_ptr<Engine::Window::Window> m_window;
+    std::unique_ptr<Engine::Graphics::Context> m_context;
+    std::unique_ptr<Engine::Graphics::Renderer> m_renderer;
+    std::unique_ptr<Engine::Graphics::Allocator> m_allocator;
 };

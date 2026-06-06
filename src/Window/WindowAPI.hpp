@@ -1,8 +1,8 @@
 #pragma once
 
-namespace Engine {
+namespace Engine::Window {
 
-enum class WindowAPI {
+enum class API {
     GLFW
 };
 

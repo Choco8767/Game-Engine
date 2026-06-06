@@ -11,8 +11,13 @@ set(SOURCES
     "Window/GLFW/GLFWWindow.cpp"
 
     # Renderer
-    "Graphics/Renderer.cpp"
+    "Graphics/GraphicsFactory.cpp"
+    "Graphics/Vulkan/VulkanGraphicsFactory.cpp"
+    "Graphics/Vulkan/VulkanContext.cpp"
     "Graphics/Vulkan/VulkanRenderer.cpp"
+    "Graphics/Vulkan/VulkanAllocator.cpp"
+    "Graphics/Vulkan/Helpers/VulkanBufferTypes.cpp"
+    "Graphics/Vulkan/Helpers/VulkanVertexHelpers.cpp"
     "Graphics/Vulkan/Procedural/Core/VulkanInstance.cpp"
     "Graphics/Vulkan/Procedural/Core/VulkanDebugMessenger.cpp"
     "Graphics/Vulkan/Procedural/Core/VulkanSurface.cpp"

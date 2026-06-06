@@ -1,13 +1,14 @@
 #include "VulkanInstance.hpp"
 
-#include <cstring>
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "VulkanConstants.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<Instance> CreateInstance(const std::vector<const char *> &requiredExtensions)
+Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
 {
     VkApplicationInfo vkAppInfo {
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -34,19 +35,15 @@ std::optional<Instance> CreateInstance(const std::vector<const char *> &required
 
     std::vector<const char *> validationLayers;
 
+    VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo { };
     if (ENABLE_VALIDATION_LAYERS) {
         validationLayers.push_back("VK_LAYER_KHRONOS_validation");
 
-        if (!CheckValidationLayerSupport(validationLayers)) {
-            std::cerr << "Requested Validation Layers, but not Available.\n";
-            return std::nullopt;
-        }
+        if (!CheckValidationLayerSupport(validationLayers))
+            throw std::runtime_error("Requested Validation Layers, but not Available.");
 
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
 
-    VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo { };
-    if (ENABLE_VALIDATION_LAYERS) {
         vkDebugMessengerCreateInfo = PopulateDebugMessengerCreateInfo();
     }
 
@@ -64,10 +61,8 @@ std::optional<Instance> CreateInstance(const std::vector<const char *> &required
     VkInstance handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateInstance(&vkInstanceCreateInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Instance. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Instance. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Instance Created Successfully.\n";
 
@@ -75,7 +70,9 @@ std::optional<Instance> CreateInstance(const std::vector<const char *> &required
         .handle = handle
     };
 
-    std::optional<DebugMessenger> debugMessenger = CreateDebugMessenger(instance);
+    std::optional<DebugMessenger> debugMessenger = std::nullopt;
+    if (ENABLE_VALIDATION_LAYERS)
+        debugMessenger = CreateDebugMessenger(instance);
 
     return Instance {
         .handle = handle,

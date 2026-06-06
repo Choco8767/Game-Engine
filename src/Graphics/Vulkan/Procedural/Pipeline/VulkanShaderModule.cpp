@@ -1,12 +1,14 @@
 #include "VulkanShaderModule.hpp"
 
+#include <format>
 #include <iostream>
+#include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
-std::optional<ShaderModule> CreateShaderModule(
+ShaderModule CreateShaderModule(
     const LogicalDevice &logicalDevice,
     const std::vector<char> &data)
 {
@@ -18,10 +20,8 @@ std::optional<ShaderModule> CreateShaderModule(
     VkShaderModule handle = VK_NULL_HANDLE;
 
     VkResult vkResult = vkCreateShaderModule(logicalDevice.handle, &createInfo, nullptr, &handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Create Vulkan Shader Module. Error Code: " << vkResult << "\n";
-        return std::nullopt;
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Create Vulkan Shader Module. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Shader Module Created Successfully.\n";
 

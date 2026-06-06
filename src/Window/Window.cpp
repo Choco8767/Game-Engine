@@ -2,14 +2,14 @@
 
 #include "GLFW/GLFWWindow.hpp"
 
-namespace Engine {
+namespace Engine::Window {
 
-std::unique_ptr<Window> CreateWindow(WindowAPI api)
+std::unique_ptr<Window> CreateWindow(API api)
 {
     std::unique_ptr<Window> window;
 
     switch (api) {
-    case WindowAPI::GLFW:
+    case API::GLFW:
         window = std::make_unique<GLFW::WindowBackend>();
         break;
     default:

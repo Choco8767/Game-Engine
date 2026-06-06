@@ -1,12 +1,12 @@
 #pragma once
 
-#include <optional>
+#include <span>
 
 #include <vulkan/vulkan.h>
 
 #include "VulkanShaderModule.hpp"
 
-namespace Engine::Vulkan {
+namespace Engine::Graphics::Vulkan {
 
 struct LogicalDevice;
 struct RenderPass;
@@ -14,14 +14,13 @@ struct RenderPass;
 struct GraphicsPipeline {
     VkPipeline handle = VK_NULL_HANDLE;
     VkPipelineLayout layout = VK_NULL_HANDLE;
-
-    std::optional<ShaderModule> vertexShaderModule = std::nullopt;
-    std::optional<ShaderModule> fragmentShaderModule = std::nullopt;
 };
 
-std::optional<GraphicsPipeline> CreateGraphicsPipeline(
+GraphicsPipeline CreateGraphicsPipeline(
     const LogicalDevice &logicalDevice,
-    const RenderPass &renderPass);
+    const RenderPass &renderPass,
+    std::span<const VkVertexInputBindingDescription> vkVertexBindingDescriptions,
+    std::span<const VkVertexInputAttributeDescription> vkVertexAttributeDescriptions);
 void DestroyGraphicsPipeline(VkDevice vkDevice, GraphicsPipeline &pipeline);
 
 }
