@@ -18,6 +18,12 @@ class Allocator;
 
 }
 
+namespace Engine::Assets {
+
+class AssetRegistry;
+
+}
+
 class App {
 public:
     App();
@@ -33,4 +39,5 @@ private:
     std::unique_ptr<Engine::Graphics::Context> m_context;
     std::unique_ptr<Engine::Graphics::Renderer> m_renderer;
     std::unique_ptr<Engine::Graphics::Allocator> m_allocator;
+    std::unique_ptr<Engine::Assets::AssetRegistry> m_assets;
 };

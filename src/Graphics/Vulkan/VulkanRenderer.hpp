@@ -30,29 +30,28 @@ struct FrameData {
     Fence inFlightFence { };
 };
 
-class RendererBackend final : public Engine::Graphics::Renderer {
+class RendererBackend final : public Renderer {
 public:
     RendererBackend(const ContextBackend &context);
     ~RendererBackend() override;
 
-    void Init(Engine::Window::Window &window) override;
+    void Init(Window::Window &window) override;
     void Destroy() override;
 
-    bool BeginFrame(const Engine::Window::Window &window) override;
-    void EndFrame(const Engine::Window::Window &window) override;
+    bool BeginFrame(const Window::Window &window) override;
+    void EndFrame(const Window::Window &window) override;
 
     void DrawMesh(
         const Allocator &allocator,
-        BufferHandle vertexBuffer,
-        BufferHandle indexBuffer,
-        uint32_t indexCount,
+        const Assets::AssetRegistry &assets,
+        MeshHandle mesh,
         uint32_t instanceCount,
         uint32_t firstIndex,
         int32_t vertexOffset,
         uint32_t firstInstance) override;
 
 private:
-    void TriggerSwapchainRecreation(const Engine::Window::Window &window);
+    void TriggerSwapchainRecreation(const Window::Window &window);
 
     const ContextBackend &m_context;
 

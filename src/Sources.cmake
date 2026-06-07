@@ -10,6 +10,10 @@ set(SOURCES
     "Window/Window.cpp"
     "Window/GLFW/GLFWWindow.cpp"
 
+    # Assets
+    "Assets/AssetFactory.cpp"
+    "Assets/AssetRegistry.cpp"
+
     # Renderer
     "Graphics/GraphicsFactory.cpp"
     "Graphics/Vulkan/VulkanGraphicsFactory.cpp"

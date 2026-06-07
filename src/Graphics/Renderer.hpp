@@ -2,11 +2,17 @@
 
 #include <cstdint>
 
-#include "Types/ResourceHandles.hpp"
+#include "Assets/Types/AssetHandles.hpp"
 
 namespace Engine::Window {
 
 class Window;
+
+}
+
+namespace Engine::Assets {
+
+class AssetRegistry;
 
 }
 
@@ -18,17 +24,16 @@ class Renderer {
 public:
     virtual ~Renderer() = default;
 
-    virtual void Init(Engine::Window::Window &window) = 0;
+    virtual void Init(Window::Window &window) = 0;
     virtual void Destroy() = 0;
 
-    virtual bool BeginFrame(const Engine::Window::Window &window) = 0;
-    virtual void EndFrame(const Engine::Window::Window &window) = 0;
+    virtual bool BeginFrame(const Window::Window &window) = 0;
+    virtual void EndFrame(const Window::Window &window) = 0;
 
     virtual void DrawMesh(
         const Allocator &allocator,
-        BufferHandle vertexBuffer,
-        BufferHandle indexBuffer,
-        uint32_t indexCount,
+        const Assets::AssetRegistry &assets,
+        MeshHandle mesh,
         uint32_t instanceCount = 1,
         uint32_t firstIndex = 0,
         int32_t vertexOffset = 0,

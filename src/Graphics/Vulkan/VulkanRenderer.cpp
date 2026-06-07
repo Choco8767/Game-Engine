@@ -1,5 +1,8 @@
 #include "VulkanRenderer.hpp"
 
+#include "Assets/AssetRegistry.hpp"
+#include "Assets/Types/GraphicsMesh.hpp"
+
 #include "VulkanAllocator.hpp"
 #include "VulkanContext.hpp"
 #include "Window/Window.hpp"
@@ -125,9 +128,8 @@ void RendererBackend::EndFrame(const Engine::Window::Window &window)
 
 void RendererBackend::DrawMesh(
     const Allocator &allocator,
-    BufferHandle vertexBuffer,
-    BufferHandle indexBuffer,
-    uint32_t indexCount,
+    const Assets::AssetRegistry &assets,
+    MeshHandle mesh,
     uint32_t instanceCount,
     uint32_t firstIndex,
     int32_t vertexOffset,
@@ -137,9 +139,11 @@ void RendererBackend::DrawMesh(
 
     const auto &vulkanAllocator = static_cast<const AllocatorBackend &>(allocator);
 
-    Vulkan::BindVertexBuffer(currentFrame.commandBuffer, vulkanAllocator, vertexBuffer, 0, 1);
-    Vulkan::BindIndexBuffer(currentFrame.commandBuffer, vulkanAllocator, indexBuffer);
-    Vulkan::DrawIndexed(currentFrame.commandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+    const auto &rawMesh = assets.GetMesh(mesh);
+
+    Vulkan::BindVertexBuffer(currentFrame.commandBuffer, vulkanAllocator, rawMesh.vertexBuffer, 0, 1);
+    Vulkan::BindIndexBuffer(currentFrame.commandBuffer, vulkanAllocator, rawMesh.indexBuffer);
+    Vulkan::DrawIndexed(currentFrame.commandBuffer, rawMesh.indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 
 void RendererBackend::Destroy()

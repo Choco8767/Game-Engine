@@ -216,7 +216,9 @@ void AllocatorBackend::DestroyBuffer(BufferHandle handle)
     Buffer &buffer = m_buffers[handle.id];
 
     if (buffer.handle != VK_NULL_HANDLE && buffer.allocation != nullptr) {
+        WaitIdle(m_context.GetLogicalDevice());
         vmaDestroyBuffer(m_handle, buffer.handle, buffer.allocation);
+
         buffer.handle = VK_NULL_HANDLE;
         buffer.allocation = nullptr;
     }
