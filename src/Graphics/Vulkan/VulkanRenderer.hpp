@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -12,6 +13,7 @@
 #include "Procedural/Core/VulkanLogicalDevice.hpp"
 #include "Procedural/Core/VulkanPhysicalDevice.hpp"
 #include "Procedural/Core/VulkanSurface.hpp"
+#include "Procedural/Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
 #include "Procedural/Pipeline/VulkanGraphicsPipeline.hpp"
 #include "Procedural/Rendering/VulkanRenderPass.hpp"
 #include "Procedural/Swapchain/VulkanSwapchain.hpp"
@@ -21,6 +23,8 @@
 namespace Engine::Graphics::Vulkan {
 
 class ContextBackend;
+
+class DescriptorSetLayoutRegistry;
 
 struct FrameData {
     CommandBuffer commandBuffer { };
@@ -54,6 +58,8 @@ private:
     void TriggerSwapchainRecreation(const Window::Window &window);
 
     const ContextBackend &m_context;
+
+    DescriptorSetLayoutRegistry m_descriptorSetLayoutRegistry;
 
     Swapchain m_swapchain;
     RenderPass m_renderPass;

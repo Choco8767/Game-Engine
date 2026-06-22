@@ -23,6 +23,7 @@ void AssetRegistry::Destroy()
         m_allocator.DestroyBuffer(mesh.vertexBuffer);
         m_allocator.DestroyBuffer(mesh.indexBuffer);
     }
+
     m_meshes.clear();
     m_freeMeshes.clear();
 }

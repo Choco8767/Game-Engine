@@ -7,12 +7,16 @@
 #include "VulkanContext.hpp"
 #include "Window/Window.hpp"
 
+#include "Graphics/Types/DescriptorTypes.hpp"
+#include "Graphics/Types/ShaderStageTypes.hpp"
 #include "Helpers/VulkanVertexHelpers.hpp"
+#include "Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
 RendererBackend::RendererBackend(const ContextBackend &context)
     : m_context(context)
+    , m_descriptorSetLayoutRegistry(context.GetLogicalDevice())
 {
 }
 
@@ -32,11 +36,19 @@ void RendererBackend::Init(Engine::Window::Window &window)
     auto bindingDescription = Vulkan::GetVertexBindingDescription();
     auto attributeDescriptions = Vulkan::GetVertexAttributeDescriptions();
 
+    auto layoutBindings = Vulkan::DescriptorSetLayoutBindings { };
+    // Vulkan::AddDescriptorLayoutBinding(layoutBindings, DescriptorType::UNIFORM_BUFFER, 0, 1, ShaderStage::VERTEX);
+
+    auto descriptorSetLayout = m_descriptorSetLayoutRegistry.CreateDescriptorSetLayout(layoutBindings);
+
     m_graphicsPipeline = Vulkan::CreateGraphicsPipeline(
         m_context.GetLogicalDevice(),
         m_renderPass,
+        m_descriptorSetLayoutRegistry,
         std::span<VkVertexInputBindingDescription>(&bindingDescription, 1),
-        attributeDescriptions);
+        attributeDescriptions,
+        std::span<DescriptorSetLayoutHandle>(&descriptorSetLayout, 1));
+
     m_commandPool = Vulkan::CreateCommandPool(
         m_context.GetLogicalDevice(),
         m_context.GetPhysicalDevice().queueFamilyIndices.graphicsFamily.value());

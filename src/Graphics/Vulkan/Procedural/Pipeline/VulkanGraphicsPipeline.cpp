@@ -5,7 +5,11 @@
 #include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
+#include "../Descriptors/VulkanDescriptorSetLayout.hpp"
+#include "../Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
 #include "../Rendering/VulkanRenderPass.hpp"
+
+#include "VulkanShaderModule.hpp"
 
 #include "Utils/ReadFile.hpp"
 
@@ -14,8 +18,10 @@ namespace Engine::Graphics::Vulkan {
 GraphicsPipeline CreateGraphicsPipeline(
     const LogicalDevice &logicalDevice,
     const RenderPass &renderPass,
+    const DescriptorSetLayoutRegistry &descriptorSetLayoutRegistry,
     std::span<const VkVertexInputBindingDescription> vkVertexBindingDescriptions,
-    std::span<const VkVertexInputAttributeDescription> vkVertexAttributeDescriptions)
+    std::span<const VkVertexInputAttributeDescription> vkVertexAttributeDescriptions,
+    std::span<const DescriptorSetLayoutHandle> descriptorSetLayouts)
 {
     auto vertexShaderData = Utils::ReadFile("./shaders/Shader.vert.spv");
     auto fragmentShaderData = Utils::ReadFile("./shaders/Shader.frag.spv");
@@ -102,8 +108,18 @@ GraphicsPipeline CreateGraphicsPipeline(
         .pAttachments = &vkColorBlendAttachmentState
     };
 
+    std::vector<VkDescriptorSetLayout> vkDescriptorSetLayouts;
+    vkDescriptorSetLayouts.reserve(descriptorSetLayouts.size());
+
+    for (auto descriptorSetLayout : descriptorSetLayouts) {
+        const auto &rawDescriptorSetLayout = descriptorSetLayoutRegistry.GetDescriptorSetLayout(descriptorSetLayout);
+        vkDescriptorSetLayouts.push_back(rawDescriptorSetLayout.handle);
+    }
+
     VkPipelineLayoutCreateInfo vkPipelineLayoutCreateInfo {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount = static_cast<uint32_t>(vkDescriptorSetLayouts.size()),
+        .pSetLayouts = vkDescriptorSetLayouts.data()
     };
 
     VkPipelineLayout layout = VK_NULL_HANDLE;

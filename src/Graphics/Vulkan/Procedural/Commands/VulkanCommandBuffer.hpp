@@ -8,7 +8,7 @@
 #include "../Sync/VulkanFence.hpp"
 #include "../Sync/VulkanSemaphore.hpp"
 
-#include "Graphics/Types/ResourceHandles.hpp"
+#include "Graphics/Types/GraphicsHandles.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

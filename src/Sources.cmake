@@ -20,7 +20,6 @@ set(SOURCES
     "Graphics/Vulkan/VulkanContext.cpp"
     "Graphics/Vulkan/VulkanRenderer.cpp"
     "Graphics/Vulkan/VulkanAllocator.cpp"
-    "Graphics/Vulkan/Helpers/VulkanBufferTypes.cpp"
     "Graphics/Vulkan/Helpers/VulkanVertexHelpers.cpp"
     "Graphics/Vulkan/Procedural/Core/VulkanInstance.cpp"
     "Graphics/Vulkan/Procedural/Core/VulkanDebugMessenger.cpp"
@@ -34,6 +33,8 @@ set(SOURCES
     "Graphics/Vulkan/Procedural/Rendering/VulkanFramebuffer.cpp"
     "Graphics/Vulkan/Procedural/Commands/VulkanCommandPool.cpp"
     "Graphics/Vulkan/Procedural/Commands/VulkanCommandBuffer.cpp"
+    "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutRegistry.cpp"
+    "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.cpp"
     "Graphics/Vulkan/Procedural/Sync/VulkanSemaphore.cpp"
     "Graphics/Vulkan/Procedural/Sync/VulkanFence.cpp"
 )

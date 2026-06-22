@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-#include "Graphics/Types/ResourceHandles.hpp"
+#include "Graphics/Types/GraphicsHandles.hpp"
 
 namespace Engine::Assets {
 
