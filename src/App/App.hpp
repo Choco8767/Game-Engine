@@ -12,7 +12,8 @@ class Window;
 
 namespace Engine::Graphics {
 
-class Context;
+class CoreContext;
+class RenderContext;
 class Renderer;
 class Allocator;
 
@@ -36,7 +37,8 @@ private:
     void Loop();
 
     std::unique_ptr<Engine::Window::Window> m_window;
-    std::unique_ptr<Engine::Graphics::Context> m_context;
+    std::unique_ptr<Engine::Graphics::CoreContext> m_coreContext;
+    std::unique_ptr<Engine::Graphics::RenderContext> m_renderContext;
     std::unique_ptr<Engine::Graphics::Renderer> m_renderer;
     std::unique_ptr<Engine::Graphics::Allocator> m_allocator;
     std::unique_ptr<Engine::Assets::AssetRegistry> m_assets;

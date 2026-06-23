@@ -9,7 +9,7 @@
 #include "Graphics/Types/BufferTypes.hpp"
 #include "Helpers/VulkanBufferTypes.hpp"
 
-#include "VulkanContext.hpp"
+#include "VulkanCoreContext.hpp"
 
 #include "Procedural/Commands/VulkanCommandBuffer.hpp"
 #include "Procedural/Core/VulkanInstance.hpp"
@@ -18,8 +18,8 @@
 
 namespace Engine::Graphics::Vulkan {
 
-AllocatorBackend::AllocatorBackend(const ContextBackend &context)
-    : m_context(context)
+AllocatorBackend::AllocatorBackend(const CoreContextBackend &coreContext)
+    : m_coreContext(coreContext)
 {
 }
 
@@ -36,10 +36,10 @@ void AllocatorBackend::Init()
     };
 
     VmaAllocatorCreateInfo allocatorInfo = {
-        .physicalDevice = m_context.GetPhysicalDevice().handle,
-        .device = m_context.GetLogicalDevice().handle,
+        .physicalDevice = m_coreContext.GetPhysicalDevice().handle,
+        .device = m_coreContext.GetLogicalDevice().handle,
         .pVulkanFunctions = &vmaVulkanFunctions,
-        .instance = m_context.GetInstance().handle,
+        .instance = m_coreContext.GetInstance().handle,
         .vulkanApiVersion = VK_API_VERSION_1_4
     };
 
@@ -50,13 +50,13 @@ void AllocatorBackend::Init()
     std::cout << "Vulkan Memory Allocator Created Successfully.\n";
 
     m_commandPool = CreateCommandPool(
-        m_context.GetLogicalDevice(),
-        m_context.GetPhysicalDevice().queueFamilyIndices.transferFamily.value());
+        m_coreContext.GetLogicalDevice(),
+        m_coreContext.GetPhysicalDevice().queueFamilyIndices.transferFamily.value());
 }
 
 void AllocatorBackend::Destroy()
 {
-    WaitIdle(m_context.GetLogicalDevice());
+    WaitIdle(m_coreContext.GetLogicalDevice());
 
     for (auto &buffer : m_buffers) {
         if (buffer.handle != VK_NULL_HANDLE && buffer.allocation != nullptr) {
@@ -68,7 +68,7 @@ void AllocatorBackend::Destroy()
     m_buffers.clear();
     m_freeBufferIndices.clear();
 
-    DestroyCommandPool(m_context.GetLogicalDevice().handle, m_commandPool);
+    DestroyCommandPool(m_coreContext.GetLogicalDevice().handle, m_commandPool);
 
     if (m_handle != nullptr) {
         vmaDestroyAllocator(m_handle);
@@ -192,17 +192,17 @@ BufferHandle AllocatorBackend::CreateBuffer(const BufferCreateInfo &info, const 
 
     MapMemory(m_handle, rawStagingBuffer.allocation, data, info.size);
 
-    auto commandBuffer = AllocateCommandBuffer(m_context.GetLogicalDevice(), m_commandPool);
+    auto commandBuffer = AllocateCommandBuffer(m_coreContext.GetLogicalDevice(), m_commandPool);
     BeginCommandBuffer(commandBuffer);
 
     CopyBuffer(commandBuffer, *this, stagingBuffer, buffer, info.size);
 
     EndCommandBuffer(commandBuffer);
-    SubmitCommandBuffer(m_context.GetLogicalDevice().transferQueue, commandBuffer);
+    SubmitCommandBuffer(m_coreContext.GetLogicalDevice().transferQueue, commandBuffer);
 
-    WaitIdle(m_context.GetLogicalDevice());
+    WaitIdle(m_coreContext.GetLogicalDevice());
 
-    FreeCommandBuffer(m_context.GetLogicalDevice().handle, commandBuffer, m_commandPool);
+    FreeCommandBuffer(m_coreContext.GetLogicalDevice().handle, commandBuffer, m_commandPool);
     DestroyBuffer(stagingBuffer);
 
     return buffer;
@@ -216,7 +216,7 @@ void AllocatorBackend::DestroyBuffer(BufferHandle handle)
     Buffer &buffer = m_buffers[handle.id];
 
     if (buffer.handle != VK_NULL_HANDLE && buffer.allocation != nullptr) {
-        WaitIdle(m_context.GetLogicalDevice());
+        WaitIdle(m_coreContext.GetLogicalDevice());
         vmaDestroyBuffer(m_handle, buffer.handle, buffer.allocation);
 
         buffer.handle = VK_NULL_HANDLE;

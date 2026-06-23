@@ -5,8 +5,9 @@
 #include "Assets/AssetFactory.hpp"
 #include "Assets/AssetRegistry.hpp"
 #include "Graphics/Allocator.hpp"
-#include "Graphics/Context.hpp"
+#include "Graphics/CoreContext.hpp"
 #include "Graphics/GraphicsFactory.hpp"
+#include "Graphics/RenderContext.hpp"
 #include "Graphics/Renderer.hpp"
 #include "Window/Window.hpp"
 
@@ -25,9 +26,10 @@ void App::Run()
 void App::Init()
 {
     m_window = Engine::Window::CreateWindow(Engine::Window::API::GLFW);
-    m_context = Engine::Graphics::CreateContext(Engine::Graphics::API::VULKAN, *m_window);
-    m_renderer = Engine::Graphics::CreateRenderer(*m_window, *m_context);
-    m_allocator = Engine::Graphics::CreateAllocator(*m_context);
+    m_coreContext = Engine::Graphics::CreateCoreContext(Engine::Graphics::API::VULKAN, *m_window);
+    m_renderContext = Engine::Graphics::CreateRenderContext(*m_coreContext);
+    m_renderer = Engine::Graphics::CreateRenderer(*m_window, *m_coreContext, *m_renderContext);
+    m_allocator = Engine::Graphics::CreateAllocator(*m_coreContext);
     m_assets = Engine::Assets::CreateAssetRegistry(*m_allocator);
 }
 

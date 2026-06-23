@@ -1,25 +1,26 @@
-#include "VulkanContext.hpp"
+#include "VulkanCoreContext.hpp"
 
 #include "Window/Window.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
-ContextBackend::~ContextBackend()
+CoreContextBackend::~CoreContextBackend()
 {
     Destroy();
 }
 
-void ContextBackend::Init(Engine::Window::Window &window)
+void CoreContextBackend::Init(Engine::Window::Window &window)
 {
     auto requiredExtensions = window.GetRequiredInstanceExtensions();
 
     m_instance = Vulkan::CreateInstance(requiredExtensions);
     m_surface = Vulkan::CreateSurface(m_instance, window);
     m_physicalDevice = Vulkan::CreatePhysicalDevice(m_instance, m_surface);
+    PopulateSurfaceDetails(m_physicalDevice, m_surface);
     m_logicalDevice = Vulkan::CreateLogicalDevice(m_physicalDevice);
 }
 
-void ContextBackend::Destroy()
+void CoreContextBackend::Destroy()
 {
     WaitIdle(m_logicalDevice);
 

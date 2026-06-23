@@ -12,7 +12,7 @@
 
 namespace Engine::Graphics::Vulkan {
 
-class ContextBackend;
+class CoreContextBackend;
 
 struct Instance;
 struct PhysicalDevice;
@@ -22,7 +22,7 @@ struct Buffer;
 
 class AllocatorBackend final : public Engine::Graphics::Allocator {
 public:
-    AllocatorBackend(const ContextBackend &context);
+    AllocatorBackend(const CoreContextBackend &coreContext);
     ~AllocatorBackend() override;
 
     void Init() override;
@@ -40,7 +40,7 @@ private:
         VmaAllocationCreateInfo vmaAllocationCreateInfo,
         std::size_t size);
 
-    const ContextBackend &m_context;
+    const CoreContextBackend &m_coreContext;
 
     CommandPool m_commandPool;
 

@@ -1,38 +1,49 @@
 #include "GraphicsFactory.hpp"
 
 #include "Allocator.hpp"
-#include "Context.hpp"
+#include "CoreContext.hpp"
+#include "RenderContext.hpp"
 #include "Renderer.hpp"
 
 #include "Vulkan/VulkanGraphicsFactory.hpp"
 
 namespace Engine::Graphics {
 
-std::unique_ptr<Context> CreateContext(API api, Engine::Window::Window &window)
+std::unique_ptr<CoreContext> CreateCoreContext(API api, Engine::Window::Window &window)
 {
     switch (api) {
     case API::VULKAN:
-        return Vulkan::CreateContext(window);
+        return Vulkan::CreateCoreContext(window);
     default:
         return nullptr;
     }
 }
 
-std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const Context &context)
+std::unique_ptr<RenderContext> CreateRenderContext(const CoreContext &coreContext)
 {
-    switch (context.GetAPIType()) {
+    switch (coreContext.GetAPIType()) {
     case API::VULKAN:
-        return Vulkan::CreateRenderer(window, context);
+        return Vulkan::CreateRenderContext(coreContext);
     default:
         return nullptr;
     }
 }
 
-std::unique_ptr<Allocator> CreateAllocator(const Context &context)
+std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const CoreContext &coreContext, const RenderContext &renderContext)
 {
-    switch (context.GetAPIType()) {
+    switch (coreContext.GetAPIType()) {
     case API::VULKAN:
-        return Vulkan::CreateAllocator(context);
+        return Vulkan::CreateRenderer(window, coreContext, renderContext);
+    default:
+        return nullptr;
+    }
+}
+
+std::unique_ptr<Allocator> CreateAllocator(const CoreContext &coreContext)
+{
+    switch (coreContext.GetAPIType()) {
+    case API::VULKAN:
+        return Vulkan::CreateAllocator(coreContext);
     default:
         return nullptr;
     }

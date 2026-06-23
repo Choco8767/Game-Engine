@@ -17,7 +17,8 @@ set(SOURCES
     # Renderer
     "Graphics/GraphicsFactory.cpp"
     "Graphics/Vulkan/VulkanGraphicsFactory.cpp"
-    "Graphics/Vulkan/VulkanContext.cpp"
+    "Graphics/Vulkan/VulkanCoreContext.cpp"
+    "Graphics/Vulkan/VulkanRenderContext.cpp"
     "Graphics/Vulkan/VulkanRenderer.cpp"
     "Graphics/Vulkan/VulkanAllocator.cpp"
     "Graphics/Vulkan/Helpers/VulkanVertexHelpers.cpp"

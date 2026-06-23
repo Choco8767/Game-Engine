@@ -1,10 +1,8 @@
 #pragma once
 
-#include <vector>
-
 #include <vulkan/vulkan.h>
 
-#include "../Context.hpp"
+#include "../CoreContext.hpp"
 
 #include "Procedural/Core/VulkanInstance.hpp"
 #include "Procedural/Core/VulkanLogicalDevice.hpp"
@@ -13,10 +11,10 @@
 
 namespace Engine::Graphics::Vulkan {
 
-class ContextBackend final : public Engine::Graphics::Context {
+class CoreContextBackend final : public Engine::Graphics::CoreContext {
 public:
-    ContextBackend() = default;
-    ~ContextBackend() override;
+    CoreContextBackend() = default;
+    ~CoreContextBackend() override;
 
     void Init(Engine::Window::Window &window) override;
     void Destroy() override;

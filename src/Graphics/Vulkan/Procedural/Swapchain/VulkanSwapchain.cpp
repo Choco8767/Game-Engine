@@ -1,6 +1,5 @@
 #include "VulkanSwapchain.hpp"
 
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <format>
@@ -19,47 +18,6 @@
 
 namespace Engine::Graphics::Vulkan {
 
-VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats)
-{
-    for (const auto &format : formats) {
-        if (
-            format.format == VK_FORMAT_B8G8R8A8_SRGB
-            && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            return format;
-    }
-
-    return formats[0];
-}
-
-VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> &presentModes)
-{
-    for (const auto &presentMode : presentModes) {
-        if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-            return presentMode;
-    }
-
-    return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D ChooseSwapchainExtent(const Engine::Window::Window &window, const VkSurfaceCapabilitiesKHR &capabilities)
-{
-    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
-        return capabilities.currentExtent;
-
-    int width = window.GetFramebufferWidth();
-    int height = window.GetFramebufferHeight();
-
-    VkExtent2D actualExtent = {
-        static_cast<uint32_t>(width),
-        static_cast<uint32_t>(height)
-    };
-
-    actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-    actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
-
-    return actualExtent;
-}
-
 Swapchain CreateSwapchain(
     const Engine::Window::Window &window,
     const Surface &surface,
@@ -68,8 +26,6 @@ Swapchain CreateSwapchain(
 {
     auto swapchainSupport = QuerySwapchainSupport(surface, physicalDevice);
 
-    VkSurfaceFormatKHR vkSurfaceFormat = ChooseSwapchainSurfaceFormat(swapchainSupport.formats);
-    VkPresentModeKHR vkPresentMode = ChooseSwapchainPresentMode(swapchainSupport.presentModes);
     VkExtent2D vkExtent = ChooseSwapchainExtent(window, swapchainSupport.capabilities);
 
     uint32_t imageCount = swapchainSupport.capabilities.minImageCount + 1;
@@ -82,14 +38,14 @@ Swapchain CreateSwapchain(
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
         .surface = surface.handle,
         .minImageCount = imageCount,
-        .imageFormat = vkSurfaceFormat.format,
-        .imageColorSpace = vkSurfaceFormat.colorSpace,
+        .imageFormat = surface.surfaceFormat.format,
+        .imageColorSpace = surface.surfaceFormat.colorSpace,
         .imageExtent = vkExtent,
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
         .preTransform = swapchainSupport.capabilities.currentTransform,
         .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-        .presentMode = vkPresentMode,
+        .presentMode = surface.presentMode,
         .clipped = VK_TRUE,
         .oldSwapchain = VK_NULL_HANDLE
     };
@@ -126,7 +82,7 @@ Swapchain CreateSwapchain(
 
     return Swapchain {
         .handle = handle,
-        .format = vkSurfaceFormat.format,
+        .format = surface.surfaceFormat.format,
         .extent = vkExtent,
         .images = std::move(vkImages),
     };

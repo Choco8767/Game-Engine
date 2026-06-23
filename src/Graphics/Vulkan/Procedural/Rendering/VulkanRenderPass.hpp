@@ -4,14 +4,14 @@
 
 namespace Engine::Graphics::Vulkan {
 
+struct Surface;
 struct LogicalDevice;
-struct Swapchain;
 
 struct RenderPass {
     VkRenderPass handle = VK_NULL_HANDLE;
 };
 
-RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Swapchain &swapchain);
+RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Surface &surface);
 void DestroyRenderPass(VkDevice vkDevice, RenderPass &renderPass);
 
 }

@@ -12,12 +12,14 @@ class Window;
 
 namespace Engine::Graphics {
 
-class Context;
+class CoreContext;
+class RenderContext;
 class Renderer;
 class Allocator;
 
-std::unique_ptr<Context> CreateContext(API api, Engine::Window::Window &window);
-std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const Context &context);
-std::unique_ptr<Allocator> CreateAllocator(const Context &context);
+std::unique_ptr<CoreContext> CreateCoreContext(API api, Engine::Window::Window &window);
+std::unique_ptr<RenderContext> CreateRenderContext(const CoreContext &coreContext);
+std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const CoreContext &coreContext, const RenderContext &renderContext);
+std::unique_ptr<Allocator> CreateAllocator(const CoreContext &coreContext);
 
 }

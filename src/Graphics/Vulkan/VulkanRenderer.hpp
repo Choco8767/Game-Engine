@@ -8,23 +8,14 @@
 #include "../Renderer.hpp"
 
 #include "Procedural/Commands/VulkanCommandBuffer.hpp"
-#include "Procedural/Commands/VulkanCommandPool.hpp"
-#include "Procedural/Core/VulkanInstance.hpp"
-#include "Procedural/Core/VulkanLogicalDevice.hpp"
-#include "Procedural/Core/VulkanPhysicalDevice.hpp"
-#include "Procedural/Core/VulkanSurface.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
-#include "Procedural/Pipeline/VulkanGraphicsPipeline.hpp"
-#include "Procedural/Rendering/VulkanRenderPass.hpp"
 #include "Procedural/Swapchain/VulkanSwapchain.hpp"
 #include "Procedural/Sync/VulkanFence.hpp"
 #include "Procedural/Sync/VulkanSemaphore.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
-class ContextBackend;
-
-class DescriptorSetLayoutRegistry;
+class CoreContextBackend;
+class RenderContextBackend;
 
 struct FrameData {
     CommandBuffer commandBuffer { };
@@ -36,11 +27,13 @@ struct FrameData {
 
 class RendererBackend final : public Renderer {
 public:
-    RendererBackend(const ContextBackend &context);
+    RendererBackend(const CoreContextBackend &coreContext, const RenderContextBackend &renderContext);
     ~RendererBackend() override;
 
     void Init(Window::Window &window) override;
     void Destroy() override;
+
+    void TriggerSwapchainRecreation(const Engine::Window::Window &window);
 
     bool BeginFrame(const Window::Window &window) override;
     void EndFrame(const Window::Window &window) override;
@@ -55,16 +48,10 @@ public:
         uint32_t firstInstance) override;
 
 private:
-    void TriggerSwapchainRecreation(const Window::Window &window);
-
-    const ContextBackend &m_context;
-
-    DescriptorSetLayoutRegistry m_descriptorSetLayoutRegistry;
+    const CoreContextBackend &m_coreContext;
+    const RenderContextBackend &m_renderContext;
 
     Swapchain m_swapchain;
-    RenderPass m_renderPass;
-    GraphicsPipeline m_graphicsPipeline;
-    CommandPool m_commandPool;
 
     std::vector<FrameData> m_frames;
     uint32_t m_imageIndex = 0;

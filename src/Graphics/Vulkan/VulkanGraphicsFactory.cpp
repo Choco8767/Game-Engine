@@ -1,27 +1,42 @@
 #include "VulkanGraphicsFactory.hpp"
 
 #include "VulkanAllocator.hpp"
-#include "VulkanContext.hpp"
+#include "VulkanCoreContext.hpp"
+#include "VulkanRenderContext.hpp"
 #include "VulkanRenderer.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
-std::unique_ptr<Context> CreateContext(Engine::Window::Window &window)
+std::unique_ptr<CoreContext> CreateCoreContext(Engine::Window::Window &window)
 {
-    auto context = std::make_unique<Vulkan::ContextBackend>();
-    if (!context)
+    auto coreContext = std::make_unique<Vulkan::CoreContextBackend>();
+    if (!coreContext)
         return nullptr;
 
-    context->Init(window);
+    coreContext->Init(window);
 
-    return context;
+    return coreContext;
 }
 
-std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const Context &context)
+std::unique_ptr<RenderContext> CreateRenderContext(const CoreContext &coreContext)
 {
-    const auto &vulkanContext = static_cast<const Vulkan::ContextBackend &>(context);
+    const auto &vulkanCoreContext = static_cast<const Vulkan::CoreContextBackend &>(coreContext);
 
-    auto renderer = std::make_unique<Vulkan::RendererBackend>(vulkanContext);
+    auto renderContext = std::make_unique<Vulkan::RenderContextBackend>(vulkanCoreContext);
+    if (!renderContext)
+        return nullptr;
+
+    renderContext->Init();
+
+    return renderContext;
+}
+
+std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const CoreContext &coreContext, const RenderContext &renderContext)
+{
+    const auto &vulkanCoreContext = static_cast<const Vulkan::CoreContextBackend &>(coreContext);
+    const auto &vulkanRenderContext = static_cast<const Vulkan::RenderContextBackend &>(renderContext);
+
+    auto renderer = std::make_unique<Vulkan::RendererBackend>(vulkanCoreContext, vulkanRenderContext);
     if (!renderer)
         return nullptr;
 
@@ -30,11 +45,11 @@ std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const C
     return renderer;
 }
 
-std::unique_ptr<Allocator> CreateAllocator(const Context &context)
+std::unique_ptr<Allocator> CreateAllocator(const CoreContext &coreContext)
 {
-    const auto &vulkanContext = static_cast<const Vulkan::ContextBackend &>(context);
+    const auto &vulkanCoreContext = static_cast<const Vulkan::CoreContextBackend &>(coreContext);
 
-    auto allocator = std::make_unique<Vulkan::AllocatorBackend>(vulkanContext);
+    auto allocator = std::make_unique<Vulkan::AllocatorBackend>(vulkanCoreContext);
     if (!allocator)
         return nullptr;
 

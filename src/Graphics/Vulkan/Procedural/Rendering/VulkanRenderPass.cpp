@@ -5,16 +5,16 @@
 #include <stdexcept>
 
 #include "../Core/VulkanLogicalDevice.hpp"
-#include "../Swapchain/VulkanSwapchain.hpp"
+#include "../Core/VulkanSurface.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
-RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Swapchain &swapchain)
+RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Surface &surface)
 {
-    std::vector<VkAttachmentDescription> vkColorAttachments = {
+    std::vector<VkAttachmentDescription> vkAttachmentDescriptions = {
         {
             // Color
-            .format = swapchain.format,
+            .format = surface.surfaceFormat.format,
             .samples = VK_SAMPLE_COUNT_1_BIT,
             .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
             .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -51,8 +51,8 @@ RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Swapchain 
 
     VkRenderPassCreateInfo vkRenderPassCreateInfo {
         .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-        .attachmentCount = static_cast<uint32_t>(vkColorAttachments.size()),
-        .pAttachments = vkColorAttachments.data(),
+        .attachmentCount = static_cast<uint32_t>(vkAttachmentDescriptions.size()),
+        .pAttachments = vkAttachmentDescriptions.data(),
         .subpassCount = static_cast<uint32_t>(vkSubpassDescriptions.size()),
         .pSubpasses = vkSubpassDescriptions.data(),
         .dependencyCount = static_cast<uint32_t>(vkSubpassDependencies.size()),

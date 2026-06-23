@@ -10,9 +10,9 @@ class Window;
 
 namespace Engine::Graphics {
 
-class Context {
+class CoreContext {
 public:
-    virtual ~Context() = default;
+    virtual ~CoreContext() = default;
 
     virtual void Init(Engine::Window::Window &window) = 0;
     virtual void Destroy() = 0;
