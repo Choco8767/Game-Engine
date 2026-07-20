@@ -15,6 +15,7 @@
 #include "Procedural/Core/VulkanInstance.hpp"
 #include "Procedural/Core/VulkanLogicalDevice.hpp"
 #include "Procedural/Core/VulkanPhysicalDevice.hpp"
+#include "Procedural/Resources/VulkanBuffer.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -101,13 +102,15 @@ BufferHandle AllocatorBackend::CreateRawBuffer(
     VkBuffer vkBuffer = VK_NULL_HANDLE;
     VmaAllocation vmaAllocation = nullptr;
 
+    VmaAllocationInfo allocationInfo { };
+
     VkResult vkResult = vmaCreateBuffer(
         m_handle,
         &vkBufferCreateInfo,
         &vmaAllocationCreateInfo,
         &vkBuffer,
         &vmaAllocation,
-        nullptr);
+        &allocationInfo);
 
     if (vkResult != VK_SUCCESS)
         throw std::runtime_error(std::format("Failed to Create Vulkan Buffer. Error Code: {}", static_cast<int>(vkResult)));
@@ -115,6 +118,7 @@ BufferHandle AllocatorBackend::CreateRawBuffer(
     Buffer buffer {
         .handle = vkBuffer,
         .allocation = vmaAllocation,
+        .mappedData = allocationInfo.pMappedData,
         .size = size
     };
 
@@ -137,25 +141,38 @@ BufferHandle AllocatorBackend::CreateBuffer(const BufferCreateInfo &info, const 
     VkBufferUsageFlags vkBufferUsageFlags = MapBufferUsage(info.usage);
     VmaAllocationCreateFlags vmaAllocationFlags = 0;
 
-    bool isStaged = (data != nullptr) && (info.size > 0) && (info.usage == BufferUsage::VERTEX || info.usage == BufferUsage::INDEX);
+    bool isStaged = (data != nullptr)
+        && (info.size > 0)
+        && (info.usage == BufferUsage::VERTEX || info.usage == BufferUsage::INDEX);
+
     if (isStaged)
         vkBufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+    VmaAllocationCreateInfo vmaAllocationCreateInfo {
+        .usage = VMA_MEMORY_USAGE_AUTO
+    };
 
     switch (info.usage) {
     case BufferUsage::VERTEX:
     case BufferUsage::INDEX:
-        if (!isStaged)
+        if (!isStaged) {
             vmaAllocationFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+            vmaAllocationFlags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        }
         break;
 
     case BufferUsage::UNIFORM:
         vmaAllocationFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        vmaAllocationFlags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
         break;
 
     case BufferUsage::STORAGE:
         vmaAllocationFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+        vmaAllocationFlags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
         break;
     }
+
+    vmaAllocationCreateInfo.flags = vmaAllocationFlags;
 
     VkBufferCreateInfo vkBufferCreateInfo {
         .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -164,15 +181,13 @@ BufferHandle AllocatorBackend::CreateBuffer(const BufferCreateInfo &info, const 
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE
     };
 
-    VmaAllocationCreateInfo vmaAllocationCreateInfo {
-        .flags = vmaAllocationFlags
-    };
-
     BufferHandle buffer = CreateRawBuffer(vkBufferCreateInfo, vmaAllocationCreateInfo, info.size);
     const auto &rawBuffer = GetBuffer(buffer);
 
     if (!isStaged) {
-        MapMemory(m_handle, rawBuffer.allocation, data, info.size);
+        if (data != nullptr && rawBuffer.mappedData != nullptr)
+            std::memcpy(rawBuffer.mappedData, data, info.size);
+
         return buffer;
     }
 
@@ -183,14 +198,16 @@ BufferHandle AllocatorBackend::CreateBuffer(const BufferCreateInfo &info, const 
     };
 
     VmaAllocationCreateInfo vmaStagingAllocationCreateInfo {
-        .flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+        .flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT,
         .usage = VMA_MEMORY_USAGE_AUTO
     };
 
     BufferHandle stagingBuffer = CreateRawBuffer(vkStagingBufferCreateInfo, vmaStagingAllocationCreateInfo, info.size);
     const auto &rawStagingBuffer = GetBuffer(stagingBuffer);
 
-    MapMemory(m_handle, rawStagingBuffer.allocation, data, info.size);
+    if (rawStagingBuffer.mappedData != nullptr) {
+        std::memcpy(rawStagingBuffer.mappedData, data, info.size);
+    }
 
     auto commandBuffer = AllocateCommandBuffer(m_coreContext.GetLogicalDevice(), m_commandPool);
     BeginCommandBuffer(commandBuffer);
@@ -224,6 +241,28 @@ void AllocatorBackend::DestroyBuffer(BufferHandle handle)
     }
 
     m_freeBufferIndices.push_back(handle.id);
+}
+
+void AllocatorBackend::UpdateBuffer(BufferHandle handle, const void *data, std::size_t size, std::size_t offset)
+{
+    if (handle.id >= m_buffers.size())
+        throw std::runtime_error(std::format("Invalid Buffer ID: {}", handle.id));
+
+    const Buffer &buffer = m_buffers[handle.id];
+
+    if (buffer.mappedData == nullptr)
+        throw std::runtime_error(std::format("Attempted to Update a Non-Host-Mapped Buffer. ID: {}", handle.id));
+
+    if (offset + size > buffer.size)
+        throw std::runtime_error(std::format("Buffer Update Out of Bounds. Size: {}, Offset: {}, Buffer Capacity: {}", size, offset, buffer.size));
+
+    std::memcpy(static_cast<char *>(buffer.mappedData) + offset, data, size);
+}
+
+// Getters
+const Buffer &AllocatorBackend::GetBuffer(BufferHandle handle) const
+{
+    return m_buffers[handle.id];
 }
 
 }

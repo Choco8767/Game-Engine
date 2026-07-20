@@ -6,7 +6,7 @@
 
 namespace Engine::Graphics::Vulkan {
 
-VkDescriptorType MapDescriptorType(DescriptorType type)
+inline VkDescriptorType MapDescriptorType(DescriptorType type)
 {
     switch (type) {
     case DescriptorType::SAMPLER:

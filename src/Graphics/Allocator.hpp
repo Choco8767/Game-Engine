@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "Graphics/Types/GraphicsHandles.hpp"
 
 namespace Engine::Graphics {
@@ -15,6 +17,7 @@ public:
 
     virtual BufferHandle CreateBuffer(const BufferCreateInfo &info, const void *data = nullptr) = 0;
     virtual void DestroyBuffer(BufferHandle handle) = 0;
+    virtual void UpdateBuffer(BufferHandle handle, const void *data, std::size_t size, std::size_t offset) = 0;
 };
 
 }

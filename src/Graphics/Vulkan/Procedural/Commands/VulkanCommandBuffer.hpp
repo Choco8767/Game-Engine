@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 
 #include <vulkan/vulkan.h>
 
@@ -19,6 +20,7 @@ struct RenderPass;
 struct GraphicsPipeline;
 struct Framebuffer;
 struct CommandPool;
+struct DescriptorSet;
 
 struct CommandBuffer {
     VkCommandBuffer handle = VK_NULL_HANDLE;
@@ -49,6 +51,11 @@ void BeginRenderPass(
     const Framebuffer &framebuffer,
     VkExtent2D extent);
 void EndRenderPass(CommandBuffer &commandBuffer);
+
+void BindDescriptorSets(
+    CommandBuffer &commandBuffer,
+    const GraphicsPipeline &graphicsPipeline,
+    std::span<const DescriptorSet> descriptorSets);
 
 void BindPipeline(
     CommandBuffer &commandBuffer,

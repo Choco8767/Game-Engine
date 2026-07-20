@@ -15,4 +15,28 @@ enum class ShaderStage : uint32_t {
     ALL = VERTEX | FRAGMENT | GEOMETRY | COMPUTE
 };
 
+inline constexpr ShaderStage operator|(ShaderStage lhs, ShaderStage rhs)
+{
+    return static_cast<ShaderStage>(
+        static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+}
+
+inline constexpr ShaderStage &operator|=(ShaderStage &lhs, ShaderStage rhs)
+{
+    lhs = lhs | rhs;
+    return lhs;
+}
+
+inline constexpr ShaderStage operator&(ShaderStage lhs, ShaderStage rhs)
+{
+    return static_cast<ShaderStage>(
+        static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
+}
+
+inline constexpr ShaderStage &operator&=(ShaderStage &lhs, ShaderStage rhs)
+{
+    lhs = lhs & rhs;
+    return lhs;
+}
+
 }

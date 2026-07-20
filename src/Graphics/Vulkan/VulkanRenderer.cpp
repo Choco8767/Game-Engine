@@ -1,5 +1,7 @@
 #include "VulkanRenderer.hpp"
 
+#include <chrono>
+
 #include "Window/Window.hpp"
 
 #include "Assets/AssetRegistry.hpp"
@@ -9,16 +11,21 @@
 #include "VulkanCoreContext.hpp"
 #include "VulkanRenderContext.hpp"
 
+#include "Graphics/Types/BufferTypes.hpp"
 #include "Graphics/Types/DescriptorTypes.hpp"
 #include "Graphics/Types/ShaderStageTypes.hpp"
 #include "Helpers/VulkanVertexHelpers.hpp"
+#include "Procedural/Descriptors/VulkanDescriptorSet.hpp"
 #include "Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
+
+static auto start = std::chrono::high_resolution_clock::now();
 
 namespace Engine::Graphics::Vulkan {
 
-RendererBackend::RendererBackend(const CoreContextBackend &coreContext, const RenderContextBackend &renderContext)
+RendererBackend::RendererBackend(CoreContextBackend &coreContext, RenderContextBackend &renderContext, AllocatorBackend &allocator)
     : m_coreContext(coreContext)
     , m_renderContext(renderContext)
+    , m_allocator(allocator)
 {
 }
 
@@ -29,17 +36,36 @@ RendererBackend::~RendererBackend()
 
 void RendererBackend::Init(Engine::Window::Window &window)
 {
+    start = std::chrono::high_resolution_clock::now();
+
     m_swapchain = Vulkan::CreateSwapchain(window, m_coreContext.GetSurface(), m_coreContext.GetPhysicalDevice(), m_coreContext.GetLogicalDevice());
     Vulkan::InitSwapchainImageViews(m_coreContext.GetLogicalDevice(), m_swapchain);
     Vulkan::InitSwapchainFramebuffers(m_coreContext.GetLogicalDevice(), m_renderContext.GetRenderPass(), m_swapchain);
 
     m_frames.resize(m_swapchain.images.size());
 
+    std::vector<DescriptorSetLayoutHandle> descriptorSetLayouts = {
+        m_renderContext.GetGlobalDescriptorSetLayout(),
+    };
+
     for (auto &frame : m_frames) {
         frame.commandBuffer = Vulkan::AllocateCommandBuffer(m_coreContext.GetLogicalDevice(), m_renderContext.GetCommandPool());
         frame.imageAvailableSemaphore = Vulkan::CreateSemaphore(m_coreContext.GetLogicalDevice());
         frame.renderFinishedSemaphore = Vulkan::CreateSemaphore(m_coreContext.GetLogicalDevice());
         frame.inFlightFence = Vulkan::CreateFence(m_coreContext.GetLogicalDevice(), true);
+
+        frame.descriptorSets = Vulkan::AllocateDescriptorSets(m_coreContext.GetLogicalDevice(), m_renderContext.GetDescriptorSetLayoutRegistry(), descriptorSetLayouts, m_renderContext.GetDescriptorPool());
+
+        frame.uniformBuffer = m_allocator.CreateBuffer({
+            .size = sizeof(UniformBufferData),
+            .usage = BufferUsage::UNIFORM,
+        });
+
+        m_renderContext.GetDescriptorWriter()
+            .WriteBuffer(m_allocator, 0, DescriptorType::UNIFORM_BUFFER, frame.uniformBuffer, 0, 0);
+
+        for (auto descriptorSet : frame.descriptorSets)
+            m_renderContext.GetDescriptorWriter().Update(m_coreContext.GetLogicalDevice(), descriptorSet);
     }
 }
 
@@ -99,6 +125,16 @@ bool RendererBackend::BeginFrame(const Engine::Window::Window &window)
         currentFrame.commandBuffer,
         m_renderContext.GetGraphicsPipeline(),
         m_swapchain.extent);
+
+    auto now = std::chrono::high_resolution_clock::now();
+    auto elapsed = now - start;
+
+    double seconds = std::chrono::duration_cast<std::chrono::duration<double>>(elapsed).count();
+
+    m_uniformBufferData.time = static_cast<float>(seconds);
+
+    m_allocator.UpdateBuffer(currentFrame.uniformBuffer, &m_uniformBufferData, sizeof(m_uniformBufferData), 0);
+    Vulkan::BindDescriptorSets(currentFrame.commandBuffer, m_renderContext.GetGraphicsPipeline(), currentFrame.descriptorSets);
 
     return true;
 }

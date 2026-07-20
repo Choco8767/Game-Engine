@@ -29,11 +29,11 @@ std::unique_ptr<RenderContext> CreateRenderContext(const CoreContext &coreContex
     }
 }
 
-std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const CoreContext &coreContext, const RenderContext &renderContext)
+std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, CoreContext &coreContext, RenderContext &renderContext, Allocator &allocator)
 {
     switch (coreContext.GetAPIType()) {
     case API::VULKAN:
-        return Vulkan::CreateRenderer(window, coreContext, renderContext);
+        return Vulkan::CreateRenderer(window, coreContext, renderContext, allocator);
     default:
         return nullptr;
     }

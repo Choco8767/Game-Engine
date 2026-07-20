@@ -7,9 +7,11 @@
 
 #include "../Commands/VulkanCommandPool.hpp"
 #include "../Core/VulkanLogicalDevice.hpp"
+#include "../Descriptors/VulkanDescriptorSet.hpp"
 #include "../Pipeline/VulkanGraphicsPipeline.hpp"
 #include "../Rendering/VulkanFramebuffer.hpp"
 #include "../Rendering/VulkanRenderPass.hpp"
+#include "../Resources/VulkanBuffer.hpp"
 #include "Graphics/Vulkan/VulkanAllocator.hpp"
 
 namespace Engine::Graphics::Vulkan {
@@ -134,6 +136,24 @@ void BeginRenderPass(
 void EndRenderPass(CommandBuffer &commandBuffer)
 {
     vkCmdEndRenderPass(commandBuffer.handle);
+}
+
+void BindDescriptorSets(CommandBuffer &commandBuffer, const GraphicsPipeline &graphicsPipeline, std::span<const DescriptorSet> descriptorSets)
+{
+    std::vector<VkDescriptorSet> vkDescriptorSets;
+    vkDescriptorSets.reserve(descriptorSets.size());
+
+    for (const auto &descriptorSet : descriptorSets)
+        vkDescriptorSets.emplace_back(descriptorSet.handle);
+
+    vkCmdBindDescriptorSets(
+        commandBuffer.handle,
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        graphicsPipeline.layout,
+        0,
+        static_cast<uint32_t>(vkDescriptorSets.size()),
+        vkDescriptorSets.data(),
+        0, nullptr);
 }
 
 void BindPipeline(

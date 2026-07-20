@@ -28,8 +28,8 @@ void App::Init()
     m_window = Engine::Window::CreateWindow(Engine::Window::API::GLFW);
     m_coreContext = Engine::Graphics::CreateCoreContext(Engine::Graphics::API::VULKAN, *m_window);
     m_renderContext = Engine::Graphics::CreateRenderContext(*m_coreContext);
-    m_renderer = Engine::Graphics::CreateRenderer(*m_window, *m_coreContext, *m_renderContext);
     m_allocator = Engine::Graphics::CreateAllocator(*m_coreContext);
+    m_renderer = Engine::Graphics::CreateRenderer(*m_window, *m_coreContext, *m_renderContext, *m_allocator);
     m_assets = Engine::Assets::CreateAssetRegistry(*m_allocator);
 }
 

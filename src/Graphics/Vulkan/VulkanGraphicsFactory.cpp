@@ -31,12 +31,13 @@ std::unique_ptr<RenderContext> CreateRenderContext(const CoreContext &coreContex
     return renderContext;
 }
 
-std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, const CoreContext &coreContext, const RenderContext &renderContext)
+std::unique_ptr<Renderer> CreateRenderer(Engine::Window::Window &window, CoreContext &coreContext, RenderContext &renderContext, Allocator &allocator)
 {
-    const auto &vulkanCoreContext = static_cast<const Vulkan::CoreContextBackend &>(coreContext);
-    const auto &vulkanRenderContext = static_cast<const Vulkan::RenderContextBackend &>(renderContext);
+    auto &vulkanCoreContext = static_cast<Vulkan::CoreContextBackend &>(coreContext);
+    auto &vulkanRenderContext = static_cast<Vulkan::RenderContextBackend &>(renderContext);
+    auto &vulkanAllocator = static_cast<Vulkan::AllocatorBackend &>(allocator);
 
-    auto renderer = std::make_unique<Vulkan::RendererBackend>(vulkanCoreContext, vulkanRenderContext);
+    auto renderer = std::make_unique<Vulkan::RendererBackend>(vulkanCoreContext, vulkanRenderContext, vulkanAllocator);
     if (!renderer)
         return nullptr;
 

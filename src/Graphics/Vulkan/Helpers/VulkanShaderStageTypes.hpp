@@ -8,7 +8,7 @@
 
 namespace Engine::Graphics::Vulkan {
 
-VkShaderStageFlags MapShaderStage(ShaderStage stage)
+inline VkShaderStageFlags MapShaderStage(ShaderStage stage)
 {
     VkShaderStageFlags vkShaderStageFlags = 0;
 

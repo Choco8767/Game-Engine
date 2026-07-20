@@ -6,7 +6,7 @@
 
 namespace Engine::Graphics::Vulkan {
 
-VkBufferUsageFlags MapBufferUsage(BufferUsage usage)
+inline VkBufferUsageFlags MapBufferUsage(BufferUsage usage)
 {
     switch (usage) {
     case Engine::Graphics::BufferUsage::VERTEX:

@@ -8,7 +8,6 @@
 #include "VMA.hpp"
 
 #include "Procedural/Commands/VulkanCommandPool.hpp"
-#include "Procedural/Resources/VulkanBuffer.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -28,11 +27,12 @@ public:
     void Init() override;
     void Destroy() override;
 
-    BufferHandle CreateBuffer(const BufferCreateInfo &info, const void *data) override;
+    BufferHandle CreateBuffer(const BufferCreateInfo &info, const void *data = nullptr) override;
     void DestroyBuffer(BufferHandle handle) override;
+    void UpdateBuffer(BufferHandle handle, const void *data, std::size_t size, std::size_t offset) override;
 
     // Getters
-    const Buffer &GetBuffer(BufferHandle handle) const { return m_buffers[handle.id]; }
+    const Buffer &GetBuffer(BufferHandle handle) const;
 
 private:
     BufferHandle CreateRawBuffer(

@@ -16,6 +16,7 @@ namespace Engine::Graphics::Vulkan {
 
 class CoreContextBackend;
 class RenderContextBackend;
+class AllocatorBackend;
 
 struct FrameData {
     CommandBuffer commandBuffer { };
@@ -23,11 +24,19 @@ struct FrameData {
     Semaphore imageAvailableSemaphore { };
     Semaphore renderFinishedSemaphore { };
     Fence inFlightFence { };
+
+    std::vector<DescriptorSet> descriptorSets;
+
+    BufferHandle uniformBuffer { };
+};
+
+struct UniformBufferData {
+    float time = 0.0f;
 };
 
 class RendererBackend final : public Renderer {
 public:
-    RendererBackend(const CoreContextBackend &coreContext, const RenderContextBackend &renderContext);
+    RendererBackend(CoreContextBackend &coreContext, RenderContextBackend &renderContext, AllocatorBackend &allocator);
     ~RendererBackend() override;
 
     void Init(Window::Window &window) override;
@@ -48,10 +57,13 @@ public:
         uint32_t firstInstance) override;
 
 private:
-    const CoreContextBackend &m_coreContext;
-    const RenderContextBackend &m_renderContext;
+    CoreContextBackend &m_coreContext;
+    RenderContextBackend &m_renderContext;
+    AllocatorBackend &m_allocator;
 
     Swapchain m_swapchain;
+
+    UniformBufferData m_uniformBufferData { };
 
     std::vector<FrameData> m_frames;
     uint32_t m_imageIndex = 0;
