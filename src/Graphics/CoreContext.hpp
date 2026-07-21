@@ -1,6 +1,8 @@
 #pragma once
 
-#include "GraphicsAPI.hpp"
+#include <memory>
+
+#include "API.hpp"
 
 namespace Engine::Window {
 
@@ -14,7 +16,7 @@ class CoreContext {
 public:
     virtual ~CoreContext() = default;
 
-    virtual void Init(Engine::Window::Window &window) = 0;
+    static std::unique_ptr<CoreContext> Create(API api, Engine::Window::Window &window);
     virtual void Destroy() = 0;
 
     // Getters

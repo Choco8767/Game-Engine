@@ -27,7 +27,7 @@ void DescriptorSetLayoutRegistry::Destroy()
 
     for (auto &descriptorSetLayout : m_descriptorSetLayouts) {
         if (descriptorSetLayout.handle != VK_NULL_HANDLE) {
-            vkDestroyDescriptorSetLayout(m_logicalDevice.handle, descriptorSetLayout.handle, nullptr);
+            vkDestroyDescriptorSetLayout(m_logicalDevice.get().handle, descriptorSetLayout.handle, nullptr);
             descriptorSetLayout.handle = VK_NULL_HANDLE;
         }
     }
@@ -46,7 +46,7 @@ DescriptorSetLayoutHandle DescriptorSetLayoutRegistry::CreateDescriptorSetLayout
 
     VkDescriptorSetLayout vkHandle = VK_NULL_HANDLE;
 
-    VkResult vkResult = vkCreateDescriptorSetLayout(m_logicalDevice.handle, &vkDescriptorSetLayoutCreateInfo, nullptr, &vkHandle);
+    VkResult vkResult = vkCreateDescriptorSetLayout(m_logicalDevice.get().handle, &vkDescriptorSetLayoutCreateInfo, nullptr, &vkHandle);
     if (vkResult != VK_SUCCESS)
         throw std::runtime_error(std::format("Failed to Create Vulkan Descriptor Set Layout. Error Code: {}", static_cast<int>(vkResult)));
 
@@ -75,7 +75,7 @@ void DescriptorSetLayoutRegistry::DestroyDescriptorSetLayout(DescriptorSetLayout
     auto &rawDescriptorSetLayout = m_descriptorSetLayouts[descriptorSetLayout.id];
 
     if (rawDescriptorSetLayout.handle != VK_NULL_HANDLE) {
-        vkDestroyDescriptorSetLayout(m_logicalDevice.handle, rawDescriptorSetLayout.handle, nullptr);
+        vkDestroyDescriptorSetLayout(m_logicalDevice.get().handle, rawDescriptorSetLayout.handle, nullptr);
         rawDescriptorSetLayout.handle = VK_NULL_HANDLE;
 
         m_freeDescriptorSetLayouts.push_back(descriptorSetLayout.id);

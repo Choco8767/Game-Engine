@@ -1,16 +1,18 @@
 #pragma once
 
-#include "GraphicsAPI.hpp"
+#include <memory>
+
+#include "API.hpp"
 
 namespace Engine::Graphics {
 
-class Context;
+class CoreContext;
 
 class RenderContext {
 public:
     virtual ~RenderContext() = default;
 
-    virtual void Init() = 0;
+    static std::unique_ptr<RenderContext> Create(const CoreContext &coreContext);
     virtual void Destroy() = 0;
 
     // Getters

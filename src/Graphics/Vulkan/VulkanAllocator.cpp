@@ -19,8 +19,14 @@
 
 namespace Engine::Graphics::Vulkan {
 
-AllocatorBackend::AllocatorBackend(const CoreContextBackend &coreContext)
+AllocatorBackend::AllocatorBackend(
+    Passkey<AllocatorBackend>,
+    const CoreContextBackend &coreContext,
+    VmaAllocator handle,
+    CommandPool commandPool)
     : m_coreContext(coreContext)
+    , m_handle(handle)
+    , m_commandPool(std::move(commandPool))
 {
 }
 
@@ -29,7 +35,7 @@ AllocatorBackend::~AllocatorBackend()
     Destroy();
 }
 
-void AllocatorBackend::Init()
+std::unique_ptr<AllocatorBackend> AllocatorBackend::Create(const CoreContextBackend &coreContext)
 {
     VmaVulkanFunctions vmaVulkanFunctions {
         .vkGetInstanceProcAddr = &vkGetInstanceProcAddr,
@@ -37,22 +43,30 @@ void AllocatorBackend::Init()
     };
 
     VmaAllocatorCreateInfo allocatorInfo = {
-        .physicalDevice = m_coreContext.GetPhysicalDevice().handle,
-        .device = m_coreContext.GetLogicalDevice().handle,
+        .physicalDevice = coreContext.GetPhysicalDevice().handle,
+        .device = coreContext.GetLogicalDevice().handle,
         .pVulkanFunctions = &vmaVulkanFunctions,
-        .instance = m_coreContext.GetInstance().handle,
+        .instance = coreContext.GetInstance().handle,
         .vulkanApiVersion = VK_API_VERSION_1_4
     };
 
-    VkResult vkResult = vmaCreateAllocator(&allocatorInfo, &m_handle);
+    VmaAllocator handle = nullptr;
+
+    VkResult vkResult = vmaCreateAllocator(&allocatorInfo, &handle);
     if (vkResult != VK_SUCCESS)
         throw std::runtime_error(std::format("Failed to Create Vulkan Memory Allocator. Error Code: {}", static_cast<int>(vkResult)));
 
     std::cout << "Vulkan Memory Allocator Created Successfully.\n";
 
-    m_commandPool = CreateCommandPool(
-        m_coreContext.GetLogicalDevice(),
-        m_coreContext.GetPhysicalDevice().queueFamilyIndices.transferFamily.value());
+    auto commandPool = CreateCommandPool(
+        coreContext.GetLogicalDevice(),
+        coreContext.GetPhysicalDevice().queueFamilyIndices.transferFamily.value());
+
+    return std::make_unique<AllocatorBackend>(
+        Passkey<AllocatorBackend> { },
+        coreContext,
+        handle,
+        std::move(commandPool));
 }
 
 void AllocatorBackend::Destroy()

@@ -1,7 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <vector>
+
+#include "Utils/Passkey.hpp"
 
 #include "../Allocator.hpp"
 
@@ -21,10 +24,20 @@ struct Buffer;
 
 class AllocatorBackend final : public Engine::Graphics::Allocator {
 public:
-    AllocatorBackend(const CoreContextBackend &coreContext);
+    AllocatorBackend(
+        Passkey<AllocatorBackend>,
+        const CoreContextBackend &coreContext,
+        VmaAllocator handle,
+        CommandPool commandPool);
     ~AllocatorBackend() override;
 
-    void Init() override;
+    AllocatorBackend(const AllocatorBackend &other) = delete;
+    AllocatorBackend &operator=(const AllocatorBackend &other) = delete;
+
+    AllocatorBackend(AllocatorBackend &&other) noexcept = default;
+    AllocatorBackend &operator=(AllocatorBackend &&other) noexcept = default;
+
+    static std::unique_ptr<AllocatorBackend> Create(const CoreContextBackend &coreContext);
     void Destroy() override;
 
     BufferHandle CreateBuffer(const BufferCreateInfo &info, const void *data = nullptr) override;
@@ -32,6 +45,8 @@ public:
     void UpdateBuffer(BufferHandle handle, const void *data, std::size_t size, std::size_t offset) override;
 
     // Getters
+    API GetAPIType() const noexcept override { return API::VULKAN; }
+
     const Buffer &GetBuffer(BufferHandle handle) const;
 
 private:

@@ -4,20 +4,40 @@
 
 namespace Engine::Graphics::Vulkan {
 
+CoreContextBackend::CoreContextBackend(
+    Passkey<CoreContextBackend>,
+    Instance instance,
+    Surface surface,
+    PhysicalDevice physicalDevice,
+    LogicalDevice logicalDevice)
+    : m_instance(std::move(instance))
+    , m_surface(std::move(surface))
+    , m_physicalDevice(std::move(physicalDevice))
+    , m_logicalDevice(std::move(logicalDevice))
+{
+}
+
 CoreContextBackend::~CoreContextBackend()
 {
     Destroy();
 }
 
-void CoreContextBackend::Init(Engine::Window::Window &window)
+std::unique_ptr<CoreContextBackend> CoreContextBackend::Create(Engine::Window::Window &window)
 {
     auto requiredExtensions = window.GetRequiredInstanceExtensions();
 
-    m_instance = Vulkan::CreateInstance(requiredExtensions);
-    m_surface = Vulkan::CreateSurface(m_instance, window);
-    m_physicalDevice = Vulkan::CreatePhysicalDevice(m_instance, m_surface);
-    PopulateSurfaceDetails(m_physicalDevice, m_surface);
-    m_logicalDevice = Vulkan::CreateLogicalDevice(m_physicalDevice);
+    auto instance = Vulkan::CreateInstance(requiredExtensions);
+    auto surface = Vulkan::CreateSurface(instance, window);
+    auto physicalDevice = Vulkan::CreatePhysicalDevice(instance, surface);
+    PopulateSurfaceDetails(physicalDevice, surface);
+    auto logicalDevice = Vulkan::CreateLogicalDevice(physicalDevice);
+
+    return std::make_unique<CoreContextBackend>(
+        Passkey<CoreContextBackend> { },
+        std::move(instance),
+        std::move(surface),
+        std::move(physicalDevice),
+        std::move(logicalDevice));
 }
 
 void CoreContextBackend::Destroy()

@@ -169,7 +169,7 @@ void RendererBackend::EndFrame(const Engine::Window::Window &window)
 }
 
 void RendererBackend::DrawMesh(
-    const Allocator &allocator,
+    const Graphics::Allocator &allocator,
     const Assets::AssetRegistry &assets,
     MeshHandle mesh,
     uint32_t instanceCount,

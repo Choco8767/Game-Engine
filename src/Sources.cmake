@@ -15,8 +15,10 @@ set(SOURCES
     "Assets/AssetRegistry.cpp"
 
     # Renderer
-    "Graphics/GraphicsFactory.cpp"
-    "Graphics/Vulkan/VulkanGraphicsFactory.cpp"
+    "Graphics/Context.cpp"
+    "Graphics/CoreContext.cpp"
+    "Graphics/RenderContext.cpp"
+    "Graphics/Allocator.cpp"
     "Graphics/Vulkan/VulkanCoreContext.cpp"
     "Graphics/Vulkan/VulkanRenderContext.cpp"
     "Graphics/Vulkan/VulkanRenderer.cpp"

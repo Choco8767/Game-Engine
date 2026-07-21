@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
+
 #include <vulkan/vulkan.h>
+
+#include "Utils/Passkey.hpp"
 
 #include "../CoreContext.hpp"
 
@@ -13,10 +17,21 @@ namespace Engine::Graphics::Vulkan {
 
 class CoreContextBackend final : public Engine::Graphics::CoreContext {
 public:
-    CoreContextBackend() = default;
+    CoreContextBackend(
+        Passkey<CoreContextBackend>,
+        Instance instance,
+        Surface surface,
+        PhysicalDevice physicalDevice,
+        LogicalDevice logicalDevice);
     ~CoreContextBackend() override;
 
-    void Init(Engine::Window::Window &window) override;
+    CoreContextBackend(const CoreContextBackend &other) = delete;
+    CoreContextBackend &operator=(const CoreContextBackend &other) = delete;
+
+    CoreContextBackend(CoreContextBackend &&other) noexcept = default;
+    CoreContextBackend &operator=(CoreContextBackend &&other) noexcept = default;
+
+    static std::unique_ptr<CoreContextBackend> Create(Engine::Window::Window &window);
     void Destroy() override;
 
     // Getters

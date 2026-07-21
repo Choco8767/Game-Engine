@@ -4,15 +4,16 @@
 
 #include "Assets/AssetFactory.hpp"
 #include "Assets/AssetRegistry.hpp"
-#include "Graphics/Allocator.hpp"
-#include "Graphics/CoreContext.hpp"
-#include "Graphics/GraphicsFactory.hpp"
-#include "Graphics/RenderContext.hpp"
-#include "Graphics/Renderer.hpp"
+#include "Graphics/Context.hpp"
 #include "Window/Window.hpp"
 
 #include "Graphics/Core/Vertex.hpp"
 #include "Graphics/Types/BufferTypes.hpp"
+
+#include "Graphics/Vulkan/VulkanAllocator.hpp" // Delete After Renderer is Transitioned to Part of an ECS
+#include "Graphics/Vulkan/VulkanCoreContext.hpp"
+#include "Graphics/Vulkan/VulkanRenderContext.hpp"
+#include "Graphics/Vulkan/VulkanRenderer.hpp"
 
 App::App() = default;
 App::~App() = default;
@@ -26,11 +27,14 @@ void App::Run()
 void App::Init()
 {
     m_window = Engine::Window::CreateWindow(Engine::Window::API::GLFW);
-    m_coreContext = Engine::Graphics::CreateCoreContext(Engine::Graphics::API::VULKAN, *m_window);
-    m_renderContext = Engine::Graphics::CreateRenderContext(*m_coreContext);
-    m_allocator = Engine::Graphics::CreateAllocator(*m_coreContext);
-    m_renderer = Engine::Graphics::CreateRenderer(*m_window, *m_coreContext, *m_renderContext, *m_allocator);
-    m_assets = Engine::Assets::CreateAssetRegistry(*m_allocator);
+
+    m_graphicsContext = Engine::Graphics::Context::Create(Engine::Graphics::API::VULKAN, *m_window);
+    m_renderer = std::make_unique<Engine::Graphics::Vulkan::RendererBackend>( // Delete After Renderer is Transitioned to Part of an ECS
+        static_cast<Engine::Graphics::Vulkan::CoreContextBackend &>(m_graphicsContext->GetCoreContext()),
+        static_cast<Engine::Graphics::Vulkan::RenderContextBackend &>(m_graphicsContext->GetRenderContext()),
+        static_cast<Engine::Graphics::Vulkan::AllocatorBackend &>(m_graphicsContext->GetAllocator()));
+    m_renderer->Init(*m_window);
+    m_assets = Engine::Assets::CreateAssetRegistry(m_graphicsContext->GetAllocator());
 }
 
 void App::Loop()
@@ -53,7 +57,7 @@ void App::Loop()
         m_window->Update();
 
         if (m_renderer->BeginFrame(*m_window)) {
-            m_renderer->DrawMesh(*m_allocator, *m_assets, mesh);
+            m_renderer->DrawMesh(m_graphicsContext->GetAllocator(), *m_assets, mesh);
             m_renderer->EndFrame(*m_window);
         }
     }

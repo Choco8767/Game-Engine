@@ -1,8 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <vulkan/vulkan.h>
+
+#include "Utils/Passkey.hpp"
 
 #include "../RenderContext.hpp"
 
@@ -19,10 +22,25 @@ class CoreContextBackend;
 
 class RenderContextBackend final : public Engine::Graphics::RenderContext {
 public:
-    RenderContextBackend(const CoreContextBackend &coreContext);
+    RenderContextBackend(
+        Passkey<RenderContextBackend>,
+        const CoreContextBackend &coreContext,
+        RenderPass renderPass,
+        GraphicsPipeline graphicsPipeline,
+        CommandPool commandPool,
+        DescriptorPool descriptorPool,
+        DescriptorWriter descriptorWriter,
+        DescriptorSetLayoutRegistry descriptorSetLayoutRegistry,
+        DescriptorSetLayoutHandle globalDescriptorSetLayout);
     ~RenderContextBackend() override;
 
-    void Init() override;
+    RenderContextBackend(const RenderContextBackend &other) = delete;
+    RenderContextBackend &operator=(const RenderContextBackend &other) = delete;
+
+    RenderContextBackend(RenderContextBackend &&other) noexcept = default;
+    RenderContextBackend &operator=(RenderContextBackend &&other) noexcept = default;
+
+    static std::unique_ptr<RenderContextBackend> Create(const CoreContextBackend &coreContext);
     void Destroy() override;
 
     // Getters
@@ -48,10 +66,9 @@ private:
     CommandPool m_commandPool;
     DescriptorPool m_descriptorPool;
     DescriptorWriter m_descriptorWriter;
+    DescriptorSetLayoutRegistry m_descriptorSetLayoutRegistry;
 
     DescriptorSetLayoutHandle m_globalDescriptorSetLayout;
-
-    DescriptorSetLayoutRegistry m_descriptorSetLayoutRegistry;
 };
 
 }
