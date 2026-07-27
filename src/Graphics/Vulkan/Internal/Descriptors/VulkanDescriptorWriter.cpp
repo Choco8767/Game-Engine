@@ -1,6 +1,6 @@
 #include "VulkanDescriptorWriter.hpp"
 
-#include "Graphics/Vulkan/Procedural/Resources/VulkanBuffer.hpp"
+#include "Graphics/Vulkan/Internal/Resources/VulkanBuffer.hpp"
 
 #include "Graphics/Vulkan/Helpers/VulkanDescriptorTypes.hpp"
 

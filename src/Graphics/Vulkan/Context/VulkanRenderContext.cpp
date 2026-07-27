@@ -8,7 +8,7 @@
 #include "Graphics/Types/ShaderStageTypes.hpp"
 
 #include "Graphics/Vulkan/Helpers/VulkanVertexHelpers.hpp"
-#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
+#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

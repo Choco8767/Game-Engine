@@ -8,7 +8,7 @@
 
 #include "Graphics/Allocators/BufferAllocator.hpp"
 
-#include "Graphics/Vulkan/Procedural/Commands/VulkanCommandPool.hpp"
+#include "Graphics/Vulkan/Internal/Commands/VulkanCommandPool.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

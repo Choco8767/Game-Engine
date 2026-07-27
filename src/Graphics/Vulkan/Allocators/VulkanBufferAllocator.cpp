@@ -11,13 +11,13 @@
 
 #include "Graphics/Vulkan/Helpers/VulkanBufferTypes.hpp"
 
-#include "Graphics/Vulkan/Procedural/Commands/VulkanCommandBuffer.hpp"
-#include "Graphics/Vulkan/Procedural/Core/VulkanInstance.hpp"
-#include "Graphics/Vulkan/Procedural/Core/VulkanLogicalDevice.hpp"
-#include "Graphics/Vulkan/Procedural/Core/VulkanPhysicalDevice.hpp"
-#include "Graphics/Vulkan/Procedural/Memory/VulkanMemoryAllocation.hpp"
-#include "Graphics/Vulkan/Procedural/Memory/VulkanMemoryAllocator.hpp"
-#include "Graphics/Vulkan/Procedural/Resources/VulkanBuffer.hpp"
+#include "Graphics/Vulkan/Internal/Commands/VulkanCommandBuffer.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanInstance.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanLogicalDevice.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanPhysicalDevice.hpp"
+#include "Graphics/Vulkan/Internal/Memory/VulkanMemoryAllocation.hpp"
+#include "Graphics/Vulkan/Internal/Memory/VulkanMemoryAllocator.hpp"
+#include "Graphics/Vulkan/Internal/Resources/VulkanBuffer.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

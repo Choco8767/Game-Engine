@@ -8,11 +8,11 @@
 
 #include "Graphics/Context/CoreContext.hpp"
 
-#include "Graphics/Vulkan/Procedural/Core/VulkanInstance.hpp"
-#include "Graphics/Vulkan/Procedural/Core/VulkanLogicalDevice.hpp"
-#include "Graphics/Vulkan/Procedural/Core/VulkanPhysicalDevice.hpp"
-#include "Graphics/Vulkan/Procedural/Core/VulkanSurface.hpp"
-#include "Graphics/Vulkan/Procedural/Memory/VulkanMemoryAllocator.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanInstance.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanLogicalDevice.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanPhysicalDevice.hpp"
+#include "Graphics/Vulkan/Internal/Core/VulkanSurface.hpp"
+#include "Graphics/Vulkan/Internal/Memory/VulkanMemoryAllocator.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

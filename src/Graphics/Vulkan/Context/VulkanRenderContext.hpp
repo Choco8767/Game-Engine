@@ -9,12 +9,12 @@
 
 #include "Graphics/Context/RenderContext.hpp"
 
-#include "Graphics/Vulkan/Procedural/Commands/VulkanCommandPool.hpp"
-#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorPool.hpp"
-#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
-#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorWriter.hpp"
-#include "Graphics/Vulkan/Procedural/Pipeline/VulkanGraphicsPipeline.hpp"
-#include "Graphics/Vulkan/Procedural/Rendering/VulkanRenderPass.hpp"
+#include "Graphics/Vulkan/Internal/Commands/VulkanCommandPool.hpp"
+#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorPool.hpp"
+#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
+#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorWriter.hpp"
+#include "Graphics/Vulkan/Internal/Pipeline/VulkanGraphicsPipeline.hpp"
+#include "Graphics/Vulkan/Internal/Rendering/VulkanRenderPass.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

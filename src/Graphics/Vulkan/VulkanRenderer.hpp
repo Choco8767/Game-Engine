@@ -8,10 +8,10 @@
 #include "Assets/Types/AssetHandles.hpp"
 #include "Graphics/Types/GraphicsHandles.hpp"
 
-#include "Procedural/Commands/VulkanCommandBuffer.hpp"
-#include "Procedural/Swapchain/VulkanSwapchain.hpp"
-#include "Procedural/Sync/VulkanFence.hpp"
-#include "Procedural/Sync/VulkanSemaphore.hpp"
+#include "Internal/Commands/VulkanCommandBuffer.hpp"
+#include "Internal/Swapchain/VulkanSwapchain.hpp"
+#include "Internal/Sync/VulkanFence.hpp"
+#include "Internal/Sync/VulkanSemaphore.hpp"
 
 namespace Engine::Assets {
 

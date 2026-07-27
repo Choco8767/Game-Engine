@@ -16,9 +16,9 @@
 
 #include "Graphics/Vulkan/Allocators/VulkanBufferAllocator.hpp"
 
-#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSet.hpp"
-#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
-#include "Graphics/Vulkan/Procedural/Resources/VulkanBuffer.hpp"
+#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorSet.hpp"
+#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
+#include "Graphics/Vulkan/Internal/Resources/VulkanBuffer.hpp"
 
 #include "Graphics/Vulkan/Helpers/VulkanVertexHelpers.hpp"
 
