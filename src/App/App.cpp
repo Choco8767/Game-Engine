@@ -4,16 +4,18 @@
 
 #include "Assets/AssetFactory.hpp"
 #include "Assets/AssetRegistry.hpp"
-#include "Graphics/Context.hpp"
 #include "Window/Window.hpp"
 
 #include "Graphics/Core/Vertex.hpp"
 #include "Graphics/Types/BufferTypes.hpp"
 
-#include "Graphics/Vulkan/VulkanAllocator.hpp" // Delete After Renderer is Transitioned to Part of an ECS
-#include "Graphics/Vulkan/VulkanCoreContext.hpp"
-#include "Graphics/Vulkan/VulkanRenderContext.hpp"
-#include "Graphics/Vulkan/VulkanRenderer.hpp"
+#include "Graphics/Context/AllocatorContext.hpp"
+#include "Graphics/Context/Context.hpp"
+
+#include "Graphics/Vulkan/Allocators/VulkanBufferAllocator.hpp"
+#include "Graphics/Vulkan/Context/VulkanCoreContext.hpp"
+#include "Graphics/Vulkan/Context/VulkanRenderContext.hpp"
+#include "Graphics/Vulkan/VulkanRenderer.hpp" // Delete After Renderer is Transitioned to Part of an ECS
 
 App::App() = default;
 App::~App() = default;
@@ -32,9 +34,9 @@ void App::Init()
     m_renderer = std::make_unique<Engine::Graphics::Vulkan::RendererBackend>( // Delete After Renderer is Transitioned to Part of an ECS
         static_cast<Engine::Graphics::Vulkan::CoreContextBackend &>(m_graphicsContext->GetCoreContext()),
         static_cast<Engine::Graphics::Vulkan::RenderContextBackend &>(m_graphicsContext->GetRenderContext()),
-        static_cast<Engine::Graphics::Vulkan::AllocatorBackend &>(m_graphicsContext->GetAllocator()));
+        static_cast<Engine::Graphics::Vulkan::BufferAllocatorBackend &>(m_graphicsContext->GetAllocatorContext().GetBufferAllocator()));
     m_renderer->Init(*m_window);
-    m_assets = Engine::Assets::CreateAssetRegistry(m_graphicsContext->GetAllocator());
+    m_assets = Engine::Assets::CreateAssetRegistry(m_graphicsContext->GetAllocatorContext());
 }
 
 void App::Loop()
@@ -57,7 +59,7 @@ void App::Loop()
         m_window->Update();
 
         if (m_renderer->BeginFrame(*m_window)) {
-            m_renderer->DrawMesh(m_graphicsContext->GetAllocator(), *m_assets, mesh);
+            m_renderer->DrawMesh(*m_assets, mesh);
             m_renderer->EndFrame(*m_window);
         }
     }

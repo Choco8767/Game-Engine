@@ -4,16 +4,14 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Graphics/Vulkan/VMA.hpp"
+#include "../Memory/VulkanMemoryAllocation.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
 struct Buffer {
     VkBuffer handle = VK_NULL_HANDLE;
-    VmaAllocation allocation = nullptr;
 
-    void *mappedData = nullptr;
-    std::size_t size = 0;
+    MemoryAllocation allocation { };
 };
 
 }

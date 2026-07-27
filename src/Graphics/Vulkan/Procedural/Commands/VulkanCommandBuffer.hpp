@@ -13,7 +13,7 @@
 
 namespace Engine::Graphics::Vulkan {
 
-class AllocatorBackend;
+class BufferAllocatorBackend;
 
 struct LogicalDevice;
 struct RenderPass;
@@ -21,6 +21,7 @@ struct GraphicsPipeline;
 struct Framebuffer;
 struct CommandPool;
 struct DescriptorSet;
+struct Buffer;
 
 struct CommandBuffer {
     VkCommandBuffer handle = VK_NULL_HANDLE;
@@ -64,23 +65,20 @@ void BindPipeline(
 
 void CopyBuffer(
     CommandBuffer &commandBuffer,
-    const AllocatorBackend &allocator,
-    BufferHandle source,
-    BufferHandle destination,
+    Buffer source,
+    Buffer destination,
     VkDeviceSize size);
 
 void BindVertexBuffer(
     CommandBuffer &commandBuffer,
-    const AllocatorBackend &allocator,
-    BufferHandle buffer,
+    Buffer buffer,
     uint32_t firstBinding,
     uint32_t bindingCount,
     VkDeviceSize offset = 0);
 
 void BindIndexBuffer(
     CommandBuffer &commandBuffer,
-    const AllocatorBackend &allocator,
-    BufferHandle buffer,
+    Buffer buffer,
     VkDeviceSize offset = 0,
     VkIndexType indexType = VK_INDEX_TYPE_UINT32);
 

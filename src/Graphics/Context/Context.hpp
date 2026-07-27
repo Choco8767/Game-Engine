@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "API.hpp"
+#include "Graphics/API.hpp"
 #include "Utils/Passkey.hpp"
 
 namespace Engine::Window {
@@ -15,7 +15,7 @@ namespace Engine::Graphics {
 
 class CoreContext;
 class RenderContext;
-class Allocator;
+class AllocatorContext;
 
 class Context {
 public:
@@ -23,7 +23,7 @@ public:
         Passkey<Context>,
         std::unique_ptr<CoreContext> coreContext,
         std::unique_ptr<RenderContext> renderContext,
-        std::unique_ptr<Allocator> allocator);
+        std::unique_ptr<AllocatorContext> allocatorContext);
     ~Context() = default;
 
     Context(const Context &other) = delete;
@@ -39,13 +39,13 @@ public:
     const CoreContext &GetCoreContext() const { return *m_coreContext; }
     RenderContext &GetRenderContext() { return *m_renderContext; }
     const RenderContext &GetRenderContext() const { return *m_renderContext; }
-    Allocator &GetAllocator() { return *m_allocator; }
-    const Allocator &GetAllocator() const { return *m_allocator; }
+    AllocatorContext &GetAllocatorContext() { return *m_allocatorContext; }
+    const AllocatorContext &GetAllocatorContext() const { return *m_allocatorContext; }
 
 private:
     std::unique_ptr<CoreContext> m_coreContext;
     std::unique_ptr<RenderContext> m_renderContext;
-    std::unique_ptr<Allocator> m_allocator;
+    std::unique_ptr<AllocatorContext> m_allocatorContext;
 };
 
 }

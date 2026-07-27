@@ -1,13 +1,14 @@
 #include "AssetRegistry.hpp"
 
-#include "Graphics/Allocator.hpp"
+#include "Graphics/Allocators/BufferAllocator.hpp"
+#include "Graphics/Context/AllocatorContext.hpp"
 #include "Graphics/Core/Vertex.hpp"
 #include "Graphics/Types/BufferTypes.hpp"
 
 namespace Engine::Assets {
 
-AssetRegistry::AssetRegistry(Graphics::Allocator &allocator)
-    : m_allocator(allocator)
+AssetRegistry::AssetRegistry(Graphics::AllocatorContext &allocatorContext)
+    : m_allocatorContext(allocatorContext)
 {
 }
 
@@ -20,8 +21,8 @@ void AssetRegistry::Destroy()
 {
 
     for (const auto &mesh : m_meshes) {
-        m_allocator.DestroyBuffer(mesh.vertexBuffer);
-        m_allocator.DestroyBuffer(mesh.indexBuffer);
+        m_allocatorContext.GetBufferAllocator().DestroyBuffer(mesh.vertexBuffer);
+        m_allocatorContext.GetBufferAllocator().DestroyBuffer(mesh.indexBuffer);
     }
 
     m_meshes.clear();
@@ -41,8 +42,8 @@ MeshHandle AssetRegistry::CreateMesh(
         .usage = Engine::Graphics::BufferUsage::INDEX
     };
 
-    BufferHandle vertexBuffer = m_allocator.CreateBuffer(vertexBufferCreateInfo, vertices.data());
-    BufferHandle indexBuffer = m_allocator.CreateBuffer(indexBufferCreateInfo, indices.data());
+    BufferHandle vertexBuffer = m_allocatorContext.GetBufferAllocator().CreateBuffer(vertexBufferCreateInfo, vertices.data());
+    BufferHandle indexBuffer = m_allocatorContext.GetBufferAllocator().CreateBuffer(indexBufferCreateInfo, indices.data());
 
     GraphicsMesh mesh {
         .vertexBuffer = vertexBuffer,
@@ -69,8 +70,8 @@ void AssetRegistry::DestroyMesh(MeshHandle mesh)
 {
     const auto &rawMesh = GetMesh(mesh);
 
-    m_allocator.DestroyBuffer(rawMesh.vertexBuffer);
-    m_allocator.DestroyBuffer(rawMesh.indexBuffer);
+    m_allocatorContext.GetBufferAllocator().DestroyBuffer(rawMesh.vertexBuffer);
+    m_allocatorContext.GetBufferAllocator().DestroyBuffer(rawMesh.indexBuffer);
 }
 
 }

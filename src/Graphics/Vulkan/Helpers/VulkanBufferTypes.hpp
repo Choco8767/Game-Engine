@@ -1,25 +1,20 @@
 #pragma once
 
+#include <vk_mem_alloc.h>
 #include <vulkan/vulkan.h>
 
 #include "Graphics/Types/BufferTypes.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
-inline VkBufferUsageFlags MapBufferUsage(BufferUsage usage)
-{
-    switch (usage) {
-    case Engine::Graphics::BufferUsage::VERTEX:
-        return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    case Engine::Graphics::BufferUsage::INDEX:
-        return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-    case Engine::Graphics::BufferUsage::UNIFORM:
-        return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-    case Engine::Graphics::BufferUsage::STORAGE:
-        return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-    default:
-        return 0;
-    }
-}
+struct BufferCreateInfo {
+    VkBufferCreateInfo vkBufferCreateInfo { };
+    VmaAllocationCreateInfo vmaAllocationCreateInfo { };
+};
+
+VkBufferUsageFlags MapBufferUsage(BufferUsage usage);
+BufferCreateInfo MapBufferCreateInfo(
+    const Graphics::BufferCreateInfo &info,
+    bool isStaged);
 
 }

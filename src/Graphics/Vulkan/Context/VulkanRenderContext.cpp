@@ -6,8 +6,9 @@
 
 #include "Graphics/Types/DescriptorTypes.hpp"
 #include "Graphics/Types/ShaderStageTypes.hpp"
-#include "Helpers/VulkanVertexHelpers.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
+
+#include "Graphics/Vulkan/Helpers/VulkanVertexHelpers.hpp"
+#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -95,7 +96,7 @@ void RenderContextBackend::Destroy()
     m_descriptorSetLayoutRegistry.Destroy();
 
     Vulkan::DestroyDescriptorPool(m_coreContext.GetLogicalDevice().handle, m_descriptorPool);
-    Vulkan::DestroyCommandPool(m_coreContext.GetLogicalDevice().handle, m_commandPool);
+    Vulkan::DestroyCommandPool(m_coreContext.GetLogicalDevice(), m_commandPool);
     Vulkan::DestroyRenderPass(m_coreContext.GetLogicalDevice().handle, m_renderPass);
 }
 

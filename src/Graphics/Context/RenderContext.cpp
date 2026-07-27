@@ -1,11 +1,10 @@
 #include "RenderContext.hpp"
 
-#include "Vulkan/VulkanCoreContext.hpp"
-
-#include "Vulkan/VulkanRenderContext.hpp"
-
 #include <format>
 #include <stdexcept>
+
+#include "Graphics/Vulkan/Context/VulkanCoreContext.hpp"
+#include "Graphics/Vulkan/Context/VulkanRenderContext.hpp"
 
 namespace Engine::Graphics {
 

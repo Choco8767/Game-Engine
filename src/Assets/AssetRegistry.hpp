@@ -8,7 +8,7 @@
 
 namespace Engine::Graphics {
 
-class Allocator;
+class AllocatorContext;
 
 struct Vertex;
 
@@ -20,7 +20,7 @@ struct GraphicsMesh;
 
 class AssetRegistry {
 public:
-    AssetRegistry(Graphics::Allocator &allocator);
+    AssetRegistry(Graphics::AllocatorContext &allocatorContext);
     ~AssetRegistry();
 
     void Destroy();
@@ -34,7 +34,7 @@ public:
     const GraphicsMesh &GetMesh(MeshHandle mesh) const { return m_meshes[mesh.id]; }
 
 private:
-    Graphics::Allocator &m_allocator;
+    Graphics::AllocatorContext &m_allocatorContext;
 
     std::vector<GraphicsMesh> m_meshes;
     std::vector<std::size_t> m_freeMeshes;

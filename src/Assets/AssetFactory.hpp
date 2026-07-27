@@ -4,7 +4,7 @@
 
 namespace Engine::Graphics {
 
-class Allocator;
+class AllocatorContext;
 
 }
 
@@ -12,6 +12,6 @@ namespace Engine::Assets {
 
 class AssetRegistry;
 
-std::unique_ptr<AssetRegistry> CreateAssetRegistry(Graphics::Allocator &allocator);
+std::unique_ptr<AssetRegistry> CreateAssetRegistry(Graphics::AllocatorContext &allocatorContext);
 
 }

@@ -7,25 +7,29 @@
 #include "Assets/AssetRegistry.hpp"
 #include "Assets/Types/GraphicsMesh.hpp"
 
-#include "VulkanAllocator.hpp"
-#include "VulkanCoreContext.hpp"
-#include "VulkanRenderContext.hpp"
-
 #include "Graphics/Types/BufferTypes.hpp"
 #include "Graphics/Types/DescriptorTypes.hpp"
 #include "Graphics/Types/ShaderStageTypes.hpp"
-#include "Helpers/VulkanVertexHelpers.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorSet.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
+
+#include "Graphics/Vulkan/Context/VulkanCoreContext.hpp"
+#include "Graphics/Vulkan/Context/VulkanRenderContext.hpp"
+
+#include "Graphics/Vulkan/Allocators/VulkanBufferAllocator.hpp"
+
+#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSet.hpp"
+#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
+#include "Graphics/Vulkan/Procedural/Resources/VulkanBuffer.hpp"
+
+#include "Graphics/Vulkan/Helpers/VulkanVertexHelpers.hpp"
 
 static auto start = std::chrono::high_resolution_clock::now();
 
 namespace Engine::Graphics::Vulkan {
 
-RendererBackend::RendererBackend(CoreContextBackend &coreContext, RenderContextBackend &renderContext, AllocatorBackend &allocator)
+RendererBackend::RendererBackend(CoreContextBackend &coreContext, RenderContextBackend &renderContext, BufferAllocatorBackend &bufferAllocator)
     : m_coreContext(coreContext)
     , m_renderContext(renderContext)
-    , m_allocator(allocator)
+    , m_bufferAllocator(bufferAllocator)
 {
 }
 
@@ -56,13 +60,13 @@ void RendererBackend::Init(Engine::Window::Window &window)
 
         frame.descriptorSets = Vulkan::AllocateDescriptorSets(m_coreContext.GetLogicalDevice(), m_renderContext.GetDescriptorSetLayoutRegistry(), descriptorSetLayouts, m_renderContext.GetDescriptorPool());
 
-        frame.uniformBuffer = m_allocator.CreateBuffer({
+        frame.uniformBuffer = m_bufferAllocator.CreateBuffer({
             .size = sizeof(UniformBufferData),
             .usage = BufferUsage::UNIFORM,
         });
 
         m_renderContext.GetDescriptorWriter()
-            .WriteBuffer(m_allocator, 0, DescriptorType::UNIFORM_BUFFER, frame.uniformBuffer, 0, 0);
+            .WriteBuffer(m_bufferAllocator.GetBuffer(frame.uniformBuffer), 0, DescriptorType::UNIFORM_BUFFER, 0, 0);
 
         for (auto descriptorSet : frame.descriptorSets)
             m_renderContext.GetDescriptorWriter().Update(m_coreContext.GetLogicalDevice(), descriptorSet);
@@ -133,7 +137,7 @@ bool RendererBackend::BeginFrame(const Engine::Window::Window &window)
 
     m_uniformBufferData.time = static_cast<float>(seconds);
 
-    m_allocator.UpdateBuffer(currentFrame.uniformBuffer, &m_uniformBufferData, sizeof(m_uniformBufferData), 0);
+    m_bufferAllocator.UpdateBuffer(currentFrame.uniformBuffer, &m_uniformBufferData, sizeof(m_uniformBufferData), 0);
     Vulkan::BindDescriptorSets(currentFrame.commandBuffer, m_renderContext.GetGraphicsPipeline(), currentFrame.descriptorSets);
 
     return true;
@@ -169,7 +173,6 @@ void RendererBackend::EndFrame(const Engine::Window::Window &window)
 }
 
 void RendererBackend::DrawMesh(
-    const Graphics::Allocator &allocator,
     const Assets::AssetRegistry &assets,
     MeshHandle mesh,
     uint32_t instanceCount,
@@ -179,12 +182,10 @@ void RendererBackend::DrawMesh(
 {
     FrameData &currentFrame = m_frames[m_currentFrame];
 
-    const auto &vulkanAllocator = static_cast<const AllocatorBackend &>(allocator);
-
     const auto &rawMesh = assets.GetMesh(mesh);
 
-    Vulkan::BindVertexBuffer(currentFrame.commandBuffer, vulkanAllocator, rawMesh.vertexBuffer, 0, 1);
-    Vulkan::BindIndexBuffer(currentFrame.commandBuffer, vulkanAllocator, rawMesh.indexBuffer);
+    Vulkan::BindVertexBuffer(currentFrame.commandBuffer, m_bufferAllocator.GetBuffer(rawMesh.vertexBuffer), 0, 1);
+    Vulkan::BindIndexBuffer(currentFrame.commandBuffer, m_bufferAllocator.GetBuffer(rawMesh.indexBuffer));
     Vulkan::DrawIndexed(currentFrame.commandBuffer, rawMesh.indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 }
 

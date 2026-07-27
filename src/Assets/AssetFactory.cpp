@@ -4,9 +4,9 @@
 
 namespace Engine::Assets {
 
-std::unique_ptr<AssetRegistry> CreateAssetRegistry(Graphics::Allocator &allocator)
+std::unique_ptr<AssetRegistry> CreateAssetRegistry(Graphics::AllocatorContext &allocatorContext)
 {
-    return std::make_unique<AssetRegistry>(allocator);
+    return std::make_unique<AssetRegistry>(allocatorContext);
 }
 
 }

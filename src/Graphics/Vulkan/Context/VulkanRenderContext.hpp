@@ -7,14 +7,14 @@
 
 #include "Utils/Passkey.hpp"
 
-#include "../RenderContext.hpp"
+#include "Graphics/Context/RenderContext.hpp"
 
-#include "Procedural/Commands/VulkanCommandPool.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorPool.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
-#include "Procedural/Descriptors/VulkanDescriptorWriter.hpp"
-#include "Procedural/Pipeline/VulkanGraphicsPipeline.hpp"
-#include "Procedural/Rendering/VulkanRenderPass.hpp"
+#include "Graphics/Vulkan/Procedural/Commands/VulkanCommandPool.hpp"
+#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorPool.hpp"
+#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorSetLayoutRegistry.hpp"
+#include "Graphics/Vulkan/Procedural/Descriptors/VulkanDescriptorWriter.hpp"
+#include "Graphics/Vulkan/Procedural/Pipeline/VulkanGraphicsPipeline.hpp"
+#include "Graphics/Vulkan/Procedural/Rendering/VulkanRenderPass.hpp"
 
 namespace Engine::Graphics::Vulkan {
 

@@ -29,10 +29,10 @@ CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, uint32_t queue
     };
 }
 
-void DestroyCommandPool(VkDevice vkDevice, CommandPool &commandPool)
+void DestroyCommandPool(const LogicalDevice &logicalDevice, CommandPool &commandPool)
 {
     if (commandPool.handle != VK_NULL_HANDLE) {
-        vkDestroyCommandPool(vkDevice, commandPool.handle, nullptr);
+        vkDestroyCommandPool(logicalDevice.handle, commandPool.handle, nullptr);
         commandPool.handle = VK_NULL_HANDLE;
     }
 }

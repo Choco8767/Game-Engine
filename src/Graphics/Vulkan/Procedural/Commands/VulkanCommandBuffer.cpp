@@ -12,7 +12,6 @@
 #include "../Rendering/VulkanFramebuffer.hpp"
 #include "../Rendering/VulkanRenderPass.hpp"
 #include "../Resources/VulkanBuffer.hpp"
-#include "Graphics/Vulkan/VulkanAllocator.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -182,9 +181,8 @@ void BindPipeline(
 
 void CopyBuffer(
     CommandBuffer &commandBuffer,
-    const AllocatorBackend &allocator,
-    BufferHandle source,
-    BufferHandle destination,
+    Buffer source,
+    Buffer destination,
     VkDeviceSize size)
 {
     VkBufferCopy vkCopyRegion {
@@ -193,47 +191,38 @@ void CopyBuffer(
         .size = size
     };
 
-    Buffer rawSourceBuffer = allocator.GetBuffer(source);
-    Buffer rawDestinationBuffer = allocator.GetBuffer(destination);
-
     vkCmdCopyBuffer(
         commandBuffer.handle,
-        rawSourceBuffer.handle,
-        rawDestinationBuffer.handle,
+        source.handle,
+        destination.handle,
         1,
         &vkCopyRegion);
 }
 
 void BindVertexBuffer(
     CommandBuffer &commandBuffer,
-    const AllocatorBackend &allocator,
-    BufferHandle buffer,
+    Buffer buffer,
     uint32_t firstBinding,
     uint32_t bindingCount,
     VkDeviceSize offset)
 {
-    Buffer rawBuffer = allocator.GetBuffer(buffer);
-
     vkCmdBindVertexBuffers(
         commandBuffer.handle,
         firstBinding,
         bindingCount,
-        &rawBuffer.handle,
+        &buffer.handle,
         &offset);
 }
 
 void BindIndexBuffer(
     CommandBuffer &commandBuffer,
-    const AllocatorBackend &allocator,
-    BufferHandle buffer,
+    Buffer buffer,
     VkDeviceSize offset,
     VkIndexType indexType)
 {
-    Buffer rawBuffer = allocator.GetBuffer(buffer);
-
     vkCmdBindIndexBuffer(
         commandBuffer.handle,
-        rawBuffer.handle,
+        buffer.handle,
         offset,
         indexType);
 }

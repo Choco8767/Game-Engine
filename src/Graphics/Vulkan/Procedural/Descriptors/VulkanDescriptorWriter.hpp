@@ -17,7 +17,7 @@ namespace Engine::Graphics::Vulkan {
 
 struct LogicalDevice;
 struct DescriptorSet;
-class AllocatorBackend;
+struct Buffer;
 
 class DescriptorWriter {
 public:
@@ -25,11 +25,11 @@ public:
     void Update(const LogicalDevice &logicalDevice, DescriptorSet targetSet);
 
     void WriteBuffer(
-        const AllocatorBackend &allocator,
+        const Buffer &buffer,
         uint32_t binding,
         Graphics::DescriptorType type,
-        BufferHandle buffer,
-        uint64_t offset, uint64_t range);
+        uint64_t offset,
+        uint64_t range);
 
 private:
     std::vector<VkWriteDescriptorSet> m_writes;

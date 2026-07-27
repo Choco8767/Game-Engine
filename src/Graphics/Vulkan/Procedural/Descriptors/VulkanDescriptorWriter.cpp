@@ -1,7 +1,8 @@
 #include "VulkanDescriptorWriter.hpp"
 
+#include "Graphics/Vulkan/Procedural/Resources/VulkanBuffer.hpp"
+
 #include "Graphics/Vulkan/Helpers/VulkanDescriptorTypes.hpp"
-#include "Graphics/Vulkan/VulkanAllocator.hpp"
 
 #include "../Core/VulkanLogicalDevice.hpp"
 #include "../Resources/VulkanBuffer.hpp"
@@ -31,18 +32,16 @@ void DescriptorWriter::Update(const LogicalDevice &logicalDevice, DescriptorSet 
 }
 
 void DescriptorWriter::WriteBuffer(
-    const AllocatorBackend &allocator,
+    const Buffer &buffer,
     uint32_t binding,
     Graphics::DescriptorType type,
-    BufferHandle buffer,
-    uint64_t offset, uint64_t range)
+    uint64_t offset,
+    uint64_t range)
 {
-    const auto &rawBuffer = allocator.GetBuffer(buffer);
-
     VkDescriptorBufferInfo bufferInfo {
-        .buffer = rawBuffer.handle,
+        .buffer = buffer.handle,
         .offset = offset,
-        .range = range == 0 ? rawBuffer.size : range
+        .range = range == 0 ? buffer.allocation.size : range
     };
 
     VkWriteDescriptorSet vkWriteDescriptorSet {

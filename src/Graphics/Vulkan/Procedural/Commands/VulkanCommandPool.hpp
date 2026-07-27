@@ -13,6 +13,6 @@ struct CommandPool {
 };
 
 CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, uint32_t queueFamilyIndex);
-void DestroyCommandPool(VkDevice vkDevice, CommandPool &commandPool);
+void DestroyCommandPool(const LogicalDevice &logicalDevice, CommandPool &commandPool);
 
 }

@@ -6,12 +6,13 @@
 
 #include "Utils/Passkey.hpp"
 
-#include "../CoreContext.hpp"
+#include "Graphics/Context/CoreContext.hpp"
 
-#include "Procedural/Core/VulkanInstance.hpp"
-#include "Procedural/Core/VulkanLogicalDevice.hpp"
-#include "Procedural/Core/VulkanPhysicalDevice.hpp"
-#include "Procedural/Core/VulkanSurface.hpp"
+#include "Graphics/Vulkan/Procedural/Core/VulkanInstance.hpp"
+#include "Graphics/Vulkan/Procedural/Core/VulkanLogicalDevice.hpp"
+#include "Graphics/Vulkan/Procedural/Core/VulkanPhysicalDevice.hpp"
+#include "Graphics/Vulkan/Procedural/Core/VulkanSurface.hpp"
+#include "Graphics/Vulkan/Procedural/Memory/VulkanMemoryAllocator.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -22,7 +23,8 @@ public:
         Instance instance,
         Surface surface,
         PhysicalDevice physicalDevice,
-        LogicalDevice logicalDevice);
+        LogicalDevice logicalDevice,
+        MemoryAllocator memoryAllocator);
     ~CoreContextBackend() override;
 
     CoreContextBackend(const CoreContextBackend &other) = delete;
@@ -41,12 +43,14 @@ public:
     const Surface &GetSurface() const { return m_surface; }
     const PhysicalDevice &GetPhysicalDevice() const { return m_physicalDevice; }
     const LogicalDevice &GetLogicalDevice() const { return m_logicalDevice; }
+    const MemoryAllocator &GetMemoryAllocator() const { return m_memoryAllocator; }
 
 private:
     Instance m_instance;
     Surface m_surface;
     PhysicalDevice m_physicalDevice;
     LogicalDevice m_logicalDevice;
+    MemoryAllocator m_memoryAllocator;
 };
 
 }

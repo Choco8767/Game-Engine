@@ -18,17 +18,12 @@ namespace Engine::Assets {
 class AssetRegistry;
 
 }
-namespace Engine::Graphics {
-
-class Allocator;
-
-}
 
 namespace Engine::Graphics::Vulkan {
 
 class CoreContextBackend;
 class RenderContextBackend;
-class AllocatorBackend;
+class BufferAllocatorBackend;
 
 struct FrameData {
     CommandBuffer commandBuffer { };
@@ -48,7 +43,7 @@ struct UniformBufferData {
 
 class RendererBackend final {
 public:
-    RendererBackend(CoreContextBackend &coreContext, RenderContextBackend &renderContext, AllocatorBackend &allocator);
+    RendererBackend(CoreContextBackend &coreContext, RenderContextBackend &renderContext, BufferAllocatorBackend &bufferAllocator);
     ~RendererBackend();
 
     void Init(Window::Window &window);
@@ -60,7 +55,6 @@ public:
     void EndFrame(const Window::Window &window);
 
     void DrawMesh(
-        const Graphics::Allocator &allocator,
         const Assets::AssetRegistry &assets,
         MeshHandle mesh,
         uint32_t instanceCount = 1,
@@ -71,7 +65,7 @@ public:
 private:
     CoreContextBackend &m_coreContext;
     RenderContextBackend &m_renderContext;
-    AllocatorBackend &m_allocator;
+    BufferAllocatorBackend &m_bufferAllocator;
 
     Swapchain m_swapchain;
 
