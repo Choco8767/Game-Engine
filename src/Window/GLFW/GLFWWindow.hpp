@@ -37,8 +37,8 @@ private:
 
     bool m_hasResized = false;
 
-    WindowFramebufferSize m_currentFramebufferSize { };
-    WindowFramebufferSize m_lastFramebufferSize { };
+    WindowFramebufferSize m_currentFramebufferSize {};
+    WindowFramebufferSize m_lastFramebufferSize {};
 };
 
 }

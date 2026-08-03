@@ -5,6 +5,9 @@ out/
 .vs/
 .vscode/
 
+# Cache
+.cache/
+
 # CMake
 CMakeLists.txt.user
 CMakeCache.txt

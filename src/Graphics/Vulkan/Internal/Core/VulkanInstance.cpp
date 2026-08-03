@@ -16,7 +16,7 @@ Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
         .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
         .pEngineName = "No Engine",
         .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-        .apiVersion = VK_API_VERSION_1_0
+        .apiVersion = VK_API_VERSION_1_4
     };
 
     std::vector<const char *> extensions(requiredExtensions.begin(), requiredExtensions.end());
@@ -35,7 +35,7 @@ Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
 
     std::vector<const char *> validationLayers;
 
-    VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo { };
+    VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo {};
     if (ENABLE_VALIDATION_LAYERS) {
         validationLayers.push_back("VK_LAYER_KHRONOS_validation");
 
@@ -63,6 +63,8 @@ Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
     VkResult vkResult = vkCreateInstance(&vkInstanceCreateInfo, nullptr, &handle);
     if (vkResult != VK_SUCCESS)
         throw std::runtime_error(std::format("Failed to Create Vulkan Instance. Error Code: {}", static_cast<int>(vkResult)));
+
+    volkLoadInstance(handle);
 
     std::cout << "Vulkan Instance Created Successfully.\n";
 

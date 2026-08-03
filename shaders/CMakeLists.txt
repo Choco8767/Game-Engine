@@ -1,6 +1,7 @@
 # Find Compilers
-find_program(DXC_EXECUTABLE dxc HINTS "$ENV{VK_SDK_PATH}/Bin")
-find_program(GLSLC_EXECUTABLE glslc HINTS "$ENV{VK_SDK_PATH}/Bin")
+
+find_program(DXC_EXECUTABLE dxc HINTS "$ENV{VULKAN_SDK}/bin")
+find_program(GLSLC_EXECUTABLE glslc HINTS "$ENV{VULKAN_SDK}/bin")
 
 if(NOT DXC_EXECUTABLE OR NOT GLSLC_EXECUTABLE)
     message(FATAL_ERROR "Could not find shader compilers in Vulkan SDK.")

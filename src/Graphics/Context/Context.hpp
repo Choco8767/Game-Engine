@@ -2,8 +2,9 @@
 
 #include <memory>
 
-#include "Graphics/API.hpp"
 #include "Utils/Passkey.hpp"
+
+#include "Graphics/API.hpp"
 
 namespace Engine::Window {
 

@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include <volk.h>
+
 #include "VulkanCoreContext.hpp"
 
 #include "Graphics/Types/DescriptorTypes.hpp"
@@ -53,7 +55,7 @@ std::unique_ptr<RenderContextBackend> RenderContextBackend::Create(const CoreCon
     DescriptorWriter descriptorWriter;
     DescriptorSetLayoutRegistry descriptorSetLayoutRegistry(coreContext.GetLogicalDevice());
 
-    auto globalLayoutBindings = Vulkan::DescriptorSetLayoutBindings { };
+    auto globalLayoutBindings = Vulkan::DescriptorSetLayoutBindings {};
     Vulkan::AddDescriptorLayoutBinding(
         globalLayoutBindings,
         DescriptorType::UNIFORM_BUFFER,
@@ -76,7 +78,7 @@ std::unique_ptr<RenderContextBackend> RenderContextBackend::Create(const CoreCon
         descriptorSetLayouts);
 
     return std::make_unique<RenderContextBackend>(
-        Passkey<RenderContextBackend> { },
+        Passkey<RenderContextBackend> {},
         coreContext,
         std::move(renderPass),
         std::move(graphicsPipeline),

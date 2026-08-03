@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 #include "WindowAPI.hpp"
 #include "WindowConstants.hpp"
@@ -24,7 +24,8 @@ public:
     virtual bool Init(
         int width = DEFAULT_WIDTH,
         int height = DEFAULT_HEIGHT,
-        const char *title = DEFAULT_TITLE) = 0;
+        const char *title = DEFAULT_TITLE)
+        = 0;
     virtual void Destroy() = 0;
 
     virtual VkSurfaceKHR CreateVulkanWindowSurface(VkInstance vkInstance) = 0;

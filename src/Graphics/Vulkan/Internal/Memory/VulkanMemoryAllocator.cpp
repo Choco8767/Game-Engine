@@ -1,7 +1,8 @@
+#include <volk.h>
+
 #define VMA_IMPLEMENTATION
 #define VMA_STATIC_VULKAN_FUNCTIONS 0
-#define VMA_DYNAMIC_VULKAN_FUNCTIONS 1
-
+#define VMA_DYNAMIC_VULKAN_FUNCTIONS 0
 #include <vk_mem_alloc.h>
 
 #include "VulkanMemoryAllocator.hpp"
@@ -22,17 +23,18 @@ MemoryAllocator CreateMemoryAllocator(
     const PhysicalDevice &physicalDevice,
     const LogicalDevice &logicalDevice)
 {
-    VmaVulkanFunctions vmaVulkanFunctions { };
-    vmaVulkanFunctions.vkGetInstanceProcAddr = &vkGetInstanceProcAddr;
-    vmaVulkanFunctions.vkGetDeviceProcAddr = &vkGetDeviceProcAddr;
-
     VmaAllocatorCreateInfo vmaAllocatorCreateInfo {
+        .flags = 0,
         .physicalDevice = physicalDevice.handle,
         .device = logicalDevice.handle,
-        .pVulkanFunctions = &vmaVulkanFunctions,
         .instance = instance.handle,
         .vulkanApiVersion = VK_API_VERSION_1_4
     };
+
+    VmaVulkanFunctions vmaVulkanFunctions {};
+    vmaImportVulkanFunctionsFromVolk(&vmaAllocatorCreateInfo, &vmaVulkanFunctions);
+
+    vmaAllocatorCreateInfo.pVulkanFunctions = &vmaVulkanFunctions;
 
     VmaAllocator handle = nullptr;
 

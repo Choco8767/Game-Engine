@@ -1,9 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
-
-#include <vulkan/vulkan.h>
 
 #include "Utils/Passkey.hpp"
 

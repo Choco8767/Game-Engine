@@ -1,6 +1,7 @@
 #include "VulkanSurface.hpp"
 
 #include <algorithm>
+#include <limits>
 
 #include "Window/Window.hpp"
 

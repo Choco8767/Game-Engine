@@ -56,7 +56,7 @@ DescriptorSetLayoutHandle DescriptorSetLayoutRegistry::CreateDescriptorSetLayout
         .handle = vkHandle
     };
 
-    DescriptorSetLayoutHandle handle { };
+    DescriptorSetLayoutHandle handle {};
 
     if (!m_freeDescriptorSetLayouts.empty()) {
         handle.id = static_cast<uint32_t>(m_freeDescriptorSetLayouts.back());

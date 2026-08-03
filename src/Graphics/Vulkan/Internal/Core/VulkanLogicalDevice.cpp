@@ -52,6 +52,8 @@ LogicalDevice CreateLogicalDevice(const PhysicalDevice &physicalDevice)
     if (vkResult != VK_SUCCESS)
         throw std::runtime_error(std::format("Failed to Create Logical Device. Error Code: {}", static_cast<int>(vkResult)));
 
+    volkLoadDevice(handle);
+
     VkQueue vkGraphicsQueue = VK_NULL_HANDLE;
     VkQueue vkPresentQueue = VK_NULL_HANDLE;
     VkQueue vkTransferQueue = VK_NULL_HANDLE;

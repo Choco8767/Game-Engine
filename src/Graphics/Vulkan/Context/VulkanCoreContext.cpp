@@ -1,5 +1,10 @@
 #include "VulkanCoreContext.hpp"
 
+#include <stdexcept>
+
+#define VOLK_IMPLEMENTATION
+#include <volk.h>
+
 #include "Window/Window.hpp"
 
 namespace Engine::Graphics::Vulkan {
@@ -26,6 +31,9 @@ CoreContextBackend::~CoreContextBackend()
 
 std::unique_ptr<CoreContextBackend> CoreContextBackend::Create(Engine::Window::Window &window)
 {
+    if (volkInitialize() != VK_SUCCESS)
+        throw std::runtime_error("Failed to Initialize Volk Loader.");
+
     auto requiredExtensions = window.GetRequiredInstanceExtensions();
 
     auto instance = Vulkan::CreateInstance(requiredExtensions);
@@ -36,7 +44,7 @@ std::unique_ptr<CoreContextBackend> CoreContextBackend::Create(Engine::Window::W
     auto memoryAllocator = CreateMemoryAllocator(instance, physicalDevice, logicalDevice);
 
     return std::make_unique<CoreContextBackend>(
-        Passkey<CoreContextBackend> { },
+        Passkey<CoreContextBackend> {},
         std::move(instance),
         std::move(surface),
         std::move(physicalDevice),

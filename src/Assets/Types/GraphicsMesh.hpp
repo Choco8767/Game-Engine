@@ -7,8 +7,8 @@
 namespace Engine::Assets {
 
 struct GraphicsMesh {
-    BufferHandle vertexBuffer { };
-    BufferHandle indexBuffer { };
+    BufferHandle vertexBuffer {};
+    BufferHandle indexBuffer {};
     std::size_t vertexCount = 0;
     std::size_t indexCount = 0;
 };

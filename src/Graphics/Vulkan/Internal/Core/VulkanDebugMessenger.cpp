@@ -1,5 +1,6 @@
 #include "VulkanInstance.hpp"
 
+#include <cstring>
 #include <format>
 #include <iostream>
 #include <stdexcept>
@@ -46,7 +47,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 
 DebugMessenger CreateDebugMessenger(const Instance &instance)
 {
-    VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo { };
+    VkDebugUtilsMessengerCreateInfoEXT vkDebugMessengerCreateInfo {};
     if (ENABLE_VALIDATION_LAYERS) {
         vkDebugMessengerCreateInfo = PopulateDebugMessengerCreateInfo();
     }

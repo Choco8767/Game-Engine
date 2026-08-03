@@ -23,7 +23,8 @@ public:
     virtual BufferHandle CreateBuffer(
         const BufferCreateInfo &info,
         const void *data = nullptr,
-        std::size_t offset = 0) = 0;
+        std::size_t offset = 0)
+        = 0;
     virtual void DestroyBuffer(BufferHandle handle) = 0;
     virtual void UpdateBuffer(BufferHandle handle, const void *data, std::size_t size, std::size_t offset) = 0;
 

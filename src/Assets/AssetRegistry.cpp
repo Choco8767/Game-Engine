@@ -52,7 +52,7 @@ MeshHandle AssetRegistry::CreateMesh(
         .indexCount = indices.size()
     };
 
-    MeshHandle handle { };
+    MeshHandle handle {};
 
     if (!m_freeMeshes.empty()) {
         handle.id = static_cast<uint32_t>(m_freeMeshes.back());

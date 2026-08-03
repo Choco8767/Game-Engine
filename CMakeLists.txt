@@ -15,10 +15,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(DEFINED ENV{VULKAN_SDK})
+    set(Vulkan_GLSLC_EXECUTABLE "$ENV{VULKAN_SDK}/bin/glslc")
+    set(Vulkan_GLSLANG_VALIDATOR_EXECUTABLE "$ENV{VULKAN_SDK}/bin/glslangValidator")
+endif()
+
 # Dependencies
 find_package(glfw3  CONFIG REQUIRED)
 find_package(glm    CONFIG REQUIRED)
-find_package(Vulkan REQUIRED)
+find_package(volk CONFIG REQUIRED)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 
 # Executable
@@ -32,13 +37,14 @@ add_subdirectory(shaders)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     glm::glm
-    Vulkan::Vulkan
+    volk::volk
     GPUOpen::VulkanMemoryAllocator
 )
 
 # Add Defines
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     GLM_ENABLE_EXPERIMENTAL
+    VK_NO_PROTOTYPES
 )
 
 install(TARGETS ${PROJECT_NAME}

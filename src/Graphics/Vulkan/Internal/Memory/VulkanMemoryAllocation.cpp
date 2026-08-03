@@ -3,6 +3,7 @@
 #include "VulkanMemoryAllocation.hpp"
 
 #include <cstdint>
+#include <cstring>
 #include <format>
 #include <iostream>
 #include <stdexcept>
@@ -53,7 +54,7 @@ Buffer CreateBuffer(
 {
     VkBuffer vkBuffer = VK_NULL_HANDLE;
     VmaAllocation vmaAllocation = nullptr;
-    VmaAllocationInfo vmaAllocationInfo { };
+    VmaAllocationInfo vmaAllocationInfo {};
 
     VkResult vkResult = vmaCreateBuffer(
         memoryAllocator.handle,
@@ -85,7 +86,7 @@ void DestroyBuffer(const MemoryAllocator &memoryAllocator, Buffer &buffer)
     if (buffer.handle != VK_NULL_HANDLE && buffer.allocation.handle != nullptr) {
         vmaDestroyBuffer(memoryAllocator.handle, buffer.handle, buffer.allocation.handle);
         buffer.handle = VK_NULL_HANDLE;
-        buffer.allocation = MemoryAllocation { };
+        buffer.allocation = MemoryAllocation {};
     }
 }
 

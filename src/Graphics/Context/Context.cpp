@@ -1,8 +1,5 @@
 #include "Context.hpp"
 
-#include <format>
-#include <stdexcept>
-
 #include "AllocatorContext.hpp"
 #include "CoreContext.hpp"
 #include "RenderContext.hpp"
@@ -27,7 +24,7 @@ std::unique_ptr<Context> Context::Create(API api, Window::Window &window)
     auto allocatorContext = AllocatorContext::Create(*coreContext);
 
     return std::make_unique<Context>(
-        Passkey<Context> { },
+        Passkey<Context> {},
         std::move(coreContext),
         std::move(renderContext),
         std::move(allocatorContext));

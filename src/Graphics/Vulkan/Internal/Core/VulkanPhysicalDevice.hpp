@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 #include "VulkanQueueFamilyIndices.hpp"
 #include "VulkanSwapchainSupportDetails.hpp"

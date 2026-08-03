@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
-
 #include "../Commands/VulkanCommandPool.hpp"
 
 typedef struct VmaAllocator_T *VmaAllocator;

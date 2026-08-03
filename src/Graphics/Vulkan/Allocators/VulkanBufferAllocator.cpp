@@ -4,6 +4,7 @@
 #include <format>
 #include <iostream>
 #include <stdexcept>
+#include <utility>
 
 #include "Graphics/Types/BufferTypes.hpp"
 
@@ -36,7 +37,7 @@ BufferAllocatorBackend::~BufferAllocatorBackend()
 std::unique_ptr<BufferAllocatorBackend> BufferAllocatorBackend::Create(const CoreContextBackend &coreContext)
 {
     return std::make_unique<BufferAllocatorBackend>(
-        Passkey<BufferAllocatorBackend> { },
+        Passkey<BufferAllocatorBackend> {},
         coreContext);
 }
 
@@ -90,7 +91,7 @@ BufferHandle BufferAllocatorBackend::CreateBuffer(const Graphics::BufferCreateIn
         MapMemory(m_coreContext.GetMemoryAllocator(), buffer.allocation, data, info.size, offset);
     }
 
-    BufferHandle handle { };
+    BufferHandle handle {};
     if (!m_freeBufferIndices.empty()) {
         handle.id = static_cast<uint32_t>(m_freeBufferIndices.back());
         m_freeBufferIndices.pop_back();

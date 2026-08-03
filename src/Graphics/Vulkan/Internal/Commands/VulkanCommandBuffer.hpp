@@ -4,7 +4,7 @@
 #include <optional>
 #include <span>
 
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 #include "../Sync/VulkanFence.hpp"
 #include "../Sync/VulkanSemaphore.hpp"

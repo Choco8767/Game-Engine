@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 namespace Engine::Window {
 
@@ -17,7 +17,7 @@ struct PhysicalDevice;
 
 struct Surface {
     VkSurfaceKHR handle = VK_NULL_HANDLE;
-    VkSurfaceFormatKHR surfaceFormat { };
+    VkSurfaceFormatKHR surfaceFormat {};
     VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
 };
 

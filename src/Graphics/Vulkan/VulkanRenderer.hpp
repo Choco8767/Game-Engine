@@ -1,9 +1,8 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 #include "Assets/Types/AssetHandles.hpp"
 #include "Graphics/Types/GraphicsHandles.hpp"
@@ -26,15 +25,15 @@ class RenderContextBackend;
 class BufferAllocatorBackend;
 
 struct FrameData {
-    CommandBuffer commandBuffer { };
+    CommandBuffer commandBuffer {};
 
-    Semaphore imageAvailableSemaphore { };
-    Semaphore renderFinishedSemaphore { };
-    Fence inFlightFence { };
+    Semaphore imageAvailableSemaphore {};
+    Semaphore renderFinishedSemaphore {};
+    Fence inFlightFence {};
 
     std::vector<DescriptorSet> descriptorSets;
 
-    BufferHandle uniformBuffer { };
+    BufferHandle uniformBuffer {};
 };
 
 struct UniformBufferData {
@@ -69,7 +68,7 @@ private:
 
     Swapchain m_swapchain;
 
-    UniformBufferData m_uniformBufferData { };
+    UniformBufferData m_uniformBufferData {};
 
     std::vector<FrameData> m_frames;
     uint32_t m_imageIndex = 0;

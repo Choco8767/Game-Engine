@@ -21,7 +21,7 @@ std::unique_ptr<AllocatorContext> AllocatorContext::Create(const CoreContext &co
     auto bufferAllocator = BufferAllocator::Create(coreContext);
 
     return std::make_unique<AllocatorContext>(
-        Passkey<AllocatorContext> { },
+        Passkey<AllocatorContext> {},
         std::move(bufferAllocator));
 }
 

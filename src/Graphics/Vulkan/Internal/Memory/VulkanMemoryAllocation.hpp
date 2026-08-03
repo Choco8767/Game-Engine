@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#include <volk.h>
+
 typedef struct VmaAllocation_T *VmaAllocation;
 struct VmaAllocationCreateInfo;
 

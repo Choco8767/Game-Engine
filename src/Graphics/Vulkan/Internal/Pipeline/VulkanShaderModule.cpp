@@ -12,7 +12,7 @@ ShaderModule CreateShaderModule(
     const LogicalDevice &logicalDevice,
     const std::vector<char> &data)
 {
-    VkShaderModuleCreateInfo createInfo { };
+    VkShaderModuleCreateInfo createInfo {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = data.size();
     createInfo.pCode = reinterpret_cast<const uint32_t *>(data.data());

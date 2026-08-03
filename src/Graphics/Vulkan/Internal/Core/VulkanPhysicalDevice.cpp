@@ -173,9 +173,9 @@ PhysicalDevice CreatePhysicalDevice(
     vkEnumeratePhysicalDevices(instance.handle, &deviceCount, vkPhysicalDevices.data());
 
     VkPhysicalDevice handle = VK_NULL_HANDLE;
-    VkPhysicalDeviceProperties properties = { };
-    VkPhysicalDeviceFeatures features = { };
-    QueueFamilyIndices indices { };
+    VkPhysicalDeviceProperties properties = {};
+    VkPhysicalDeviceFeatures features = {};
+    QueueFamilyIndices indices {};
 
     int bestSuitability = -1;
 
@@ -223,7 +223,7 @@ PhysicalDevice CreatePhysicalDevice(
 void DestroyPhysicalDevice(PhysicalDevice &physicalDevice)
 {
     physicalDevice.handle = VK_NULL_HANDLE;
-    physicalDevice.queueFamilyIndices = { };
+    physicalDevice.queueFamilyIndices = {};
 }
 
 }
