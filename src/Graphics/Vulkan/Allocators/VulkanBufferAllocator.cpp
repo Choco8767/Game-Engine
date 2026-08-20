@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <format>
-#include <iostream>
 #include <stdexcept>
 #include <utility>
 
@@ -13,9 +12,7 @@
 #include "Graphics/Vulkan/Helpers/VulkanBufferTypes.hpp"
 
 #include "Graphics/Vulkan/Internal/Commands/VulkanCommandBuffer.hpp"
-#include "Graphics/Vulkan/Internal/Core/VulkanInstance.hpp"
 #include "Graphics/Vulkan/Internal/Core/VulkanLogicalDevice.hpp"
-#include "Graphics/Vulkan/Internal/Core/VulkanPhysicalDevice.hpp"
 #include "Graphics/Vulkan/Internal/Memory/VulkanMemoryAllocation.hpp"
 #include "Graphics/Vulkan/Internal/Memory/VulkanMemoryAllocator.hpp"
 #include "Graphics/Vulkan/Internal/Resources/VulkanBuffer.hpp"
@@ -44,7 +41,7 @@ std::unique_ptr<BufferAllocatorBackend> BufferAllocatorBackend::Create(const Cor
 void BufferAllocatorBackend::Destroy()
 {
     for (auto &buffer : m_buffers) {
-        Vulkan::DestroyBuffer(m_coreContext.GetMemoryAllocator(), buffer);
+        Vulkan::DestroyBuffer(m_coreContext.get().GetMemoryAllocator(), buffer);
     }
 
     m_buffers.clear();
@@ -58,7 +55,7 @@ BufferHandle BufferAllocatorBackend::CreateBuffer(const Graphics::BufferCreateIn
         && (info.usage == BufferUsage::VERTEX || info.usage == BufferUsage::INDEX);
 
     BufferCreateInfo bufferCreateInfo = MapBufferCreateInfo(info, isStaged);
-    Buffer buffer = Vulkan::CreateBuffer(m_coreContext.GetMemoryAllocator(), bufferCreateInfo.vkBufferCreateInfo, bufferCreateInfo.vmaAllocationCreateInfo, offset);
+    Buffer buffer = Vulkan::CreateBuffer(m_coreContext.get().GetMemoryAllocator(), bufferCreateInfo.vkBufferCreateInfo, bufferCreateInfo.vmaAllocationCreateInfo, offset);
 
     if (isStaged) {
         BufferCreateInfo stagingBufferCreateInfo {
@@ -73,31 +70,31 @@ BufferHandle BufferAllocatorBackend::CreateBuffer(const Graphics::BufferCreateIn
             }
         };
 
-        Buffer stagingBuffer = Vulkan::CreateBuffer(m_coreContext.GetMemoryAllocator(), stagingBufferCreateInfo.vkBufferCreateInfo, stagingBufferCreateInfo.vmaAllocationCreateInfo, offset);
-        MapMemory(m_coreContext.GetMemoryAllocator(), stagingBuffer.allocation, data, info.size, offset);
+        Buffer stagingBuffer = Vulkan::CreateBuffer(m_coreContext.get().GetMemoryAllocator(), stagingBufferCreateInfo.vkBufferCreateInfo, stagingBufferCreateInfo.vmaAllocationCreateInfo, offset);
+        MapMemory(m_coreContext.get().GetMemoryAllocator(), stagingBuffer.allocation, data, info.size, offset);
 
-        auto commandBuffer = AllocateCommandBuffer(m_coreContext.GetLogicalDevice(), m_coreContext.GetMemoryAllocator().commandPool);
+        auto commandBuffer = AllocateCommandBuffer(m_coreContext.get().GetLogicalDevice(), m_coreContext.get().GetMemoryAllocator().commandPool);
 
         BeginCommandBuffer(commandBuffer);
         CopyBuffer(commandBuffer, stagingBuffer, buffer, info.size);
         EndCommandBuffer(commandBuffer);
-        SubmitCommandBuffer(m_coreContext.GetLogicalDevice().transferQueue, commandBuffer);
+        SubmitCommandBuffer(m_coreContext.get().GetLogicalDevice().transferQueue, commandBuffer);
 
-        WaitIdle(m_coreContext.GetLogicalDevice());
-        FreeCommandBuffer(m_coreContext.GetLogicalDevice().handle, commandBuffer, m_coreContext.GetMemoryAllocator().commandPool);
+        WaitIdle(m_coreContext.get().GetLogicalDevice());
+        FreeCommandBuffer(m_coreContext.get().GetLogicalDevice().handle, commandBuffer, m_coreContext.get().GetMemoryAllocator().commandPool);
 
-        Vulkan::DestroyBuffer(m_coreContext.GetMemoryAllocator(), stagingBuffer);
+        Vulkan::DestroyBuffer(m_coreContext.get().GetMemoryAllocator(), stagingBuffer);
     } else if (data != nullptr) {
-        MapMemory(m_coreContext.GetMemoryAllocator(), buffer.allocation, data, info.size, offset);
+        MapMemory(m_coreContext.get().GetMemoryAllocator(), buffer.allocation, data, info.size, offset);
     }
 
     BufferHandle handle {};
     if (!m_freeBufferIndices.empty()) {
-        handle.id = static_cast<uint32_t>(m_freeBufferIndices.back());
+        handle.id = static_cast<std::uint32_t>(m_freeBufferIndices.back());
         m_freeBufferIndices.pop_back();
         m_buffers[handle.id] = buffer;
     } else {
-        handle.id = static_cast<uint32_t>(m_buffers.size());
+        handle.id = static_cast<std::uint32_t>(m_buffers.size());
         m_buffers.push_back(buffer);
     }
 
@@ -111,9 +108,9 @@ void BufferAllocatorBackend::DestroyBuffer(BufferHandle handle)
     if (buffer.handle == VK_NULL_HANDLE)
         return;
 
-    WaitIdle(m_coreContext.GetLogicalDevice());
+    WaitIdle(m_coreContext.get().GetLogicalDevice());
 
-    Vulkan::DestroyBuffer(m_coreContext.GetMemoryAllocator(), buffer);
+    Vulkan::DestroyBuffer(m_coreContext.get().GetMemoryAllocator(), buffer);
 
     m_freeBufferIndices.push_back(handle.id);
 }
@@ -128,7 +125,7 @@ void BufferAllocatorBackend::UpdateBuffer(BufferHandle handle, const void *data,
     if (offset + size > buffer.allocation.size)
         throw std::runtime_error(std::format("Buffer Update Out of Bounds. Size: {}, Offset: {}, Buffer Capacity: {}", size, offset, buffer.allocation.size));
 
-    MapMemory(m_coreContext.GetMemoryAllocator(), buffer.allocation, data, size, offset);
+    MapMemory(m_coreContext.get().GetMemoryAllocator(), buffer.allocation, data, size, offset);
 }
 
 // Getters

@@ -8,7 +8,7 @@
 
 namespace Engine::Graphics::Vulkan {
 
-CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, uint32_t queueFamilyIndex)
+CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, std::uint32_t queueFamilyIndex)
 {
     VkCommandPoolCreateInfo vkCommandPoolCreateInfo {
         .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,

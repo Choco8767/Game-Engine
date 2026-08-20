@@ -7,7 +7,6 @@
 #include "Window/Window.hpp"
 
 #include "Graphics/Core/Vertex.hpp"
-#include "Graphics/Types/BufferTypes.hpp"
 
 #include "Graphics/Context/AllocatorContext.hpp"
 #include "Graphics/Context/Context.hpp"
@@ -48,7 +47,7 @@ void App::Loop()
         { { -0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f } }
     };
 
-    const std::vector<uint32_t> indices = {
+    const std::vector<std::uint32_t> indices = {
         0, 1, 2,
         2, 3, 0
     };

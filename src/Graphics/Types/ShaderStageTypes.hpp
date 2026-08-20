@@ -5,7 +5,7 @@
 
 namespace Engine::Graphics {
 
-enum class ShaderStage : uint32_t {
+enum class ShaderStage : std::uint8_t {
     NONE = 0,
     VERTEX = 1 << 0,
     FRAGMENT = 1 << 1,
@@ -18,7 +18,7 @@ enum class ShaderStage : uint32_t {
 inline constexpr ShaderStage operator|(ShaderStage lhs, ShaderStage rhs)
 {
     return static_cast<ShaderStage>(
-        static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+        static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
 }
 
 inline constexpr ShaderStage &operator|=(ShaderStage &lhs, ShaderStage rhs)
@@ -30,7 +30,7 @@ inline constexpr ShaderStage &operator|=(ShaderStage &lhs, ShaderStage rhs)
 inline constexpr ShaderStage operator&(ShaderStage lhs, ShaderStage rhs)
 {
     return static_cast<ShaderStage>(
-        static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
+        static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs));
 }
 
 inline constexpr ShaderStage &operator&=(ShaderStage &lhs, ShaderStage rhs)

@@ -4,8 +4,6 @@
 
 #include <volk.h>
 
-#include "Graphics/Core/Vertex.hpp"
-
 namespace Engine::Graphics::Vulkan {
 
 VkVertexInputBindingDescription GetVertexBindingDescription();

@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 
 namespace Engine::Graphics {
 
-enum class BufferUsage {
+enum class BufferUsage : std::uint8_t {
     VERTEX,
     INDEX,
     UNIFORM,

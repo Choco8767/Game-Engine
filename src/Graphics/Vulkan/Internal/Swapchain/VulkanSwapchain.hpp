@@ -32,7 +32,7 @@ struct Swapchain {
 };
 
 struct AcquireNextSwapchainImageResult {
-    uint32_t imageIndex;
+    std::uint32_t imageIndex;
     VkResult result;
 
     bool NeedsRecreation() const
@@ -82,6 +82,6 @@ AcquireNextSwapchainImageResult AcquireNextSwapchainImage(
 PresentSwapchainImageResult PresentSwapchainImage(
     VkQueue vkPresentQueue,
     const Swapchain &swapchain,
-    uint32_t imageIndex,
+    std::uint32_t imageIndex,
     const Semaphore &renderFinished);
 }

@@ -88,7 +88,7 @@ void SubmitCommandBuffer(
         std::array<VkSemaphore, 1> waitSemaphores = { waitSemaphore->handle };
         std::array<VkPipelineStageFlags, 1> waitStages = { waitStage.value() };
 
-        vkSubmitInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
+        vkSubmitInfo.waitSemaphoreCount = static_cast<std::uint32_t>(waitSemaphores.size());
         vkSubmitInfo.pWaitSemaphores = &waitSemaphore->handle;
         vkSubmitInfo.pWaitDstStageMask = &waitStage.value();
     }
@@ -96,7 +96,7 @@ void SubmitCommandBuffer(
     if (signalSemaphore.has_value()) {
         std::array<VkSemaphore, 1> signalSemaphores = { signalSemaphore->handle };
 
-        vkSubmitInfo.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
+        vkSubmitInfo.signalSemaphoreCount = static_cast<std::uint32_t>(signalSemaphores.size());
         vkSubmitInfo.pSignalSemaphores = &signalSemaphore->handle;
     }
 
@@ -125,7 +125,7 @@ void BeginRenderPass(
         .renderArea = {
             .offset = { 0, 0 },
             .extent = extent },
-        .clearValueCount = static_cast<uint32_t>(vkClearValues.size()),
+        .clearValueCount = static_cast<std::uint32_t>(vkClearValues.size()),
         .pClearValues = vkClearValues.data()
     };
 
@@ -150,7 +150,7 @@ void BindDescriptorSets(CommandBuffer &commandBuffer, const GraphicsPipeline &gr
         VK_PIPELINE_BIND_POINT_GRAPHICS,
         graphicsPipeline.layout,
         0,
-        static_cast<uint32_t>(vkDescriptorSets.size()),
+        static_cast<std::uint32_t>(vkDescriptorSets.size()),
         vkDescriptorSets.data(),
         0, nullptr);
 }
@@ -202,8 +202,8 @@ void CopyBuffer(
 void BindVertexBuffer(
     CommandBuffer &commandBuffer,
     Buffer buffer,
-    uint32_t firstBinding,
-    uint32_t bindingCount,
+    std::uint32_t firstBinding,
+    std::uint32_t bindingCount,
     VkDeviceSize offset)
 {
     vkCmdBindVertexBuffers(
@@ -229,10 +229,10 @@ void BindIndexBuffer(
 
 void Draw(
     CommandBuffer &commandBuffer,
-    uint32_t vertexCount,
-    uint32_t instanceCount,
-    uint32_t firstVertex,
-    uint32_t firstInstance)
+    std::uint32_t vertexCount,
+    std::uint32_t instanceCount,
+    std::uint32_t firstVertex,
+    std::uint32_t firstInstance)
 {
     vkCmdDraw(
         commandBuffer.handle,
@@ -244,11 +244,11 @@ void Draw(
 
 void DrawIndexed(
     CommandBuffer &commandBuffer,
-    uint32_t indexCount,
-    uint32_t instanceCount,
-    uint32_t firstIndex,
-    int32_t vertexOffset,
-    uint32_t firstInstance)
+    std::uint32_t indexCount,
+    std::uint32_t instanceCount,
+    std::uint32_t firstIndex,
+    std::int32_t vertexOffset,
+    std::uint32_t firstInstance)
 {
     vkCmdDrawIndexed(
         commandBuffer.handle,

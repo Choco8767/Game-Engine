@@ -51,11 +51,11 @@ RenderPass CreateRenderPass(const LogicalDevice &logicalDevice, const Surface &s
 
     VkRenderPassCreateInfo vkRenderPassCreateInfo {
         .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-        .attachmentCount = static_cast<uint32_t>(vkAttachmentDescriptions.size()),
+        .attachmentCount = static_cast<std::uint32_t>(vkAttachmentDescriptions.size()),
         .pAttachments = vkAttachmentDescriptions.data(),
-        .subpassCount = static_cast<uint32_t>(vkSubpassDescriptions.size()),
+        .subpassCount = static_cast<std::uint32_t>(vkSubpassDescriptions.size()),
         .pSubpasses = vkSubpassDescriptions.data(),
-        .dependencyCount = static_cast<uint32_t>(vkSubpassDependencies.size()),
+        .dependencyCount = static_cast<std::uint32_t>(vkSubpassDependencies.size()),
         .pDependencies = vkSubpassDependencies.data()
     };
 

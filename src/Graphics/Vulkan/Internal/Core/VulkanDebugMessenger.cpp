@@ -75,7 +75,7 @@ void DestroyDebugMessenger(VkInstance vkInstance, DebugMessenger &messenger)
 
 bool CheckValidationLayerSupport(const std::vector<const char *> &validationLayers)
 {
-    uint32_t layerCount;
+    std::uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
     std::vector<VkLayerProperties> availableLayers(layerCount);

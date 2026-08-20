@@ -5,15 +5,10 @@
 #include <cstdint>
 #include <cstring>
 #include <format>
-#include <iostream>
 #include <stdexcept>
 
 #include "VulkanMemoryAllocator.hpp"
 
-#include "../Commands/VulkanCommandPool.hpp"
-#include "../Core/VulkanInstance.hpp"
-#include "../Core/VulkanLogicalDevice.hpp"
-#include "../Core/VulkanPhysicalDevice.hpp"
 #include "../Resources/VulkanBuffer.hpp"
 
 namespace Engine::Graphics::Vulkan {
@@ -29,7 +24,7 @@ void MapMemory(
         return;
 
     if (memoryAllocation.mappedData != nullptr) {
-        std::memcpy(static_cast<uint8_t *>(memoryAllocation.mappedData) + offset, data, size);
+        std::memcpy(static_cast<std::uint8_t *>(memoryAllocation.mappedData) + offset, data, size);
         return;
     }
 
@@ -40,7 +35,7 @@ void MapMemory(
             "Failed to Map VMA Memory. Error Code: {}", static_cast<int>(vkResult)));
     }
 
-    std::memcpy(static_cast<uint8_t *>(mappedData) + offset, data, size);
+    std::memcpy(static_cast<std::uint8_t *>(mappedData) + offset, data, size);
 
     vmaFlushAllocation(memoryAllocator.handle, memoryAllocation.handle, offset, size);
     vmaUnmapMemory(memoryAllocator.handle, memoryAllocation.handle);

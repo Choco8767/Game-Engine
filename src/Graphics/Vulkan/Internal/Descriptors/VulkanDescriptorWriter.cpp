@@ -24,7 +24,7 @@ void DescriptorWriter::Update(const LogicalDevice &logicalDevice, DescriptorSet 
 
     vkUpdateDescriptorSets(
         logicalDevice.handle,
-        static_cast<uint32_t>(m_writes.size()),
+        static_cast<std::uint32_t>(m_writes.size()),
         m_writes.data(),
         0, nullptr);
 
@@ -33,10 +33,10 @@ void DescriptorWriter::Update(const LogicalDevice &logicalDevice, DescriptorSet 
 
 void DescriptorWriter::WriteBuffer(
     const Buffer &buffer,
-    uint32_t binding,
+    std::uint32_t binding,
     Graphics::DescriptorType type,
-    uint64_t offset,
-    uint64_t range)
+    std::uint64_t offset,
+    std::uint64_t range)
 {
     VkDescriptorBufferInfo bufferInfo {
         .buffer = buffer.handle,

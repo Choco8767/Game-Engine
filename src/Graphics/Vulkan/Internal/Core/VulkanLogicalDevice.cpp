@@ -15,7 +15,7 @@ LogicalDevice CreateLogicalDevice(const PhysicalDevice &physicalDevice)
 {
     float queuePriority = 1.0f;
 
-    std::set<uint32_t> uniqueQueueFamilies = {
+    std::set<std::uint32_t> uniqueQueueFamilies = {
         physicalDevice.queueFamilyIndices.graphicsFamily.value(),
         physicalDevice.queueFamilyIndices.presentFamily.value(),
         physicalDevice.queueFamilyIndices.transferFamily.value()
@@ -24,7 +24,7 @@ LogicalDevice CreateLogicalDevice(const PhysicalDevice &physicalDevice)
     std::vector<VkDeviceQueueCreateInfo> vkQueueCreateInfos;
     vkQueueCreateInfos.reserve(uniqueQueueFamilies.size());
 
-    for (uint32_t queueFamily : uniqueQueueFamilies) {
+    for (std::uint32_t queueFamily : uniqueQueueFamilies) {
         VkDeviceQueueCreateInfo vkQueueCreateInfo {
             .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
             .queueFamilyIndex = queueFamily,
@@ -39,9 +39,9 @@ LogicalDevice CreateLogicalDevice(const PhysicalDevice &physicalDevice)
 
     VkDeviceCreateInfo vkDeviceCreateInfo {
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-        .queueCreateInfoCount = static_cast<uint32_t>(vkQueueCreateInfos.size()),
+        .queueCreateInfoCount = static_cast<std::uint32_t>(vkQueueCreateInfos.size()),
         .pQueueCreateInfos = vkQueueCreateInfos.data(),
-        .enabledExtensionCount = static_cast<uint32_t>(DEVICE_EXTENSIONS.size()),
+        .enabledExtensionCount = static_cast<std::uint32_t>(DEVICE_EXTENSIONS.size()),
         .ppEnabledExtensionNames = DEVICE_EXTENSIONS.data(),
         .pEnabledFeatures = &vkPhysicalDeviceFeatures
     };

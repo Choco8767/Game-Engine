@@ -53,15 +53,15 @@ GraphicsPipeline CreateGraphicsPipeline(
 
     VkPipelineDynamicStateCreateInfo vkDynamicStateCreateInfo {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-        .dynamicStateCount = static_cast<uint32_t>(vkDynamicStates.size()),
+        .dynamicStateCount = static_cast<std::uint32_t>(vkDynamicStates.size()),
         .pDynamicStates = vkDynamicStates.data()
     };
 
     VkPipelineVertexInputStateCreateInfo vkVertexInputCreateInfo {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .vertexBindingDescriptionCount = static_cast<uint32_t>(vkVertexBindingDescriptions.size()),
+        .vertexBindingDescriptionCount = static_cast<std::uint32_t>(vkVertexBindingDescriptions.size()),
         .pVertexBindingDescriptions = vkVertexBindingDescriptions.data(),
-        .vertexAttributeDescriptionCount = static_cast<uint32_t>(vkVertexAttributeDescriptions.size()),
+        .vertexAttributeDescriptionCount = static_cast<std::uint32_t>(vkVertexAttributeDescriptions.size()),
         .pVertexAttributeDescriptions = vkVertexAttributeDescriptions.data()
     };
 
@@ -118,7 +118,7 @@ GraphicsPipeline CreateGraphicsPipeline(
 
     VkPipelineLayoutCreateInfo vkPipelineLayoutCreateInfo {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-        .setLayoutCount = static_cast<uint32_t>(vkDescriptorSetLayouts.size()),
+        .setLayoutCount = static_cast<std::uint32_t>(vkDescriptorSetLayouts.size()),
         .pSetLayouts = vkDescriptorSetLayouts.data()
     };
 
@@ -132,7 +132,7 @@ GraphicsPipeline CreateGraphicsPipeline(
 
     VkGraphicsPipelineCreateInfo vkPipelineCreateInfo {
         .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-        .stageCount = static_cast<uint32_t>(vkShaderStageCreateInfos.size()),
+        .stageCount = static_cast<std::uint32_t>(vkShaderStageCreateInfos.size()),
         .pStages = vkShaderStageCreateInfos.data(),
         .pVertexInputState = &vkVertexInputCreateInfo,
         .pInputAssemblyState = &vkInputAssemblyCreateInfo,

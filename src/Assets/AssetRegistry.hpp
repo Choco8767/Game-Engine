@@ -27,7 +27,7 @@ public:
 
     MeshHandle CreateMesh(
         const std::vector<Graphics::Vertex> &vertices,
-        const std::vector<uint32_t> &indices);
+        const std::vector<std::uint32_t> &indices);
     void DestroyMesh(MeshHandle mesh);
 
     // Getters

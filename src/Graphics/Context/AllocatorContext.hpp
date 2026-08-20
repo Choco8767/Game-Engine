@@ -4,9 +4,6 @@
 
 #include "Utils/Passkey.hpp"
 
-#include "Graphics/API.hpp"
-#include "Graphics/Types/GraphicsHandles.hpp"
-
 namespace Engine::Graphics {
 
 class CoreContext;

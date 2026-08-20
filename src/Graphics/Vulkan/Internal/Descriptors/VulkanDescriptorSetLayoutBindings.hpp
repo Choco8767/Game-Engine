@@ -5,12 +5,8 @@
 
 #include <volk.h>
 
-namespace Engine::Graphics {
-
-enum class DescriptorType;
-enum class ShaderStage : uint32_t;
-
-}
+#include "Graphics/Types/DescriptorTypes.hpp"
+#include "Graphics/Types/ShaderStageTypes.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -21,8 +17,8 @@ struct DescriptorSetLayoutBindings {
 void AddDescriptorLayoutBinding(
     DescriptorSetLayoutBindings &bindings,
     Graphics::DescriptorType type,
-    uint32_t binding,
-    uint32_t count,
+    std::uint32_t binding,
+    std::uint32_t count,
     Graphics::ShaderStage stages);
 
 }

@@ -9,8 +9,6 @@
 #include "../Sync/VulkanFence.hpp"
 #include "../Sync/VulkanSemaphore.hpp"
 
-#include "Graphics/Types/GraphicsHandles.hpp"
-
 namespace Engine::Graphics::Vulkan {
 
 class BufferAllocatorBackend;
@@ -72,8 +70,8 @@ void CopyBuffer(
 void BindVertexBuffer(
     CommandBuffer &commandBuffer,
     Buffer buffer,
-    uint32_t firstBinding,
-    uint32_t bindingCount,
+    std::uint32_t firstBinding,
+    std::uint32_t bindingCount,
     VkDeviceSize offset = 0);
 
 void BindIndexBuffer(
@@ -84,17 +82,17 @@ void BindIndexBuffer(
 
 void Draw(
     CommandBuffer &commandBuffer,
-    uint32_t vertexCount,
-    uint32_t instanceCount,
-    uint32_t firstVertex,
-    uint32_t firstInstance);
+    std::uint32_t vertexCount,
+    std::uint32_t instanceCount,
+    std::uint32_t firstVertex,
+    std::uint32_t firstInstance);
 
 void DrawIndexed(
     CommandBuffer &commandBuffer,
-    uint32_t indexCount,
-    uint32_t instanceCount,
-    uint32_t firstIndex,
-    int32_t vertexOffset,
-    uint32_t firstInstance);
+    std::uint32_t indexCount,
+    std::uint32_t instanceCount,
+    std::uint32_t firstIndex,
+    std::int32_t vertexOffset,
+    std::uint32_t firstInstance);
 
 }

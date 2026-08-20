@@ -15,7 +15,7 @@ ShaderModule CreateShaderModule(
     VkShaderModuleCreateInfo createInfo {};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = data.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t *>(data.data());
+    createInfo.pCode = reinterpret_cast<const std::uint32_t *>(data.data());
 
     VkShaderModule handle = VK_NULL_HANDLE;
 

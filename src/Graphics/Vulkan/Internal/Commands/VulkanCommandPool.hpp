@@ -12,7 +12,7 @@ struct CommandPool {
     VkCommandPool handle = VK_NULL_HANDLE;
 };
 
-CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, uint32_t queueFamilyIndex);
+CommandPool CreateCommandPool(const LogicalDevice &logicalDevice, std::uint32_t queueFamilyIndex);
 void DestroyCommandPool(const LogicalDevice &logicalDevice, CommandPool &commandPool);
 
 }

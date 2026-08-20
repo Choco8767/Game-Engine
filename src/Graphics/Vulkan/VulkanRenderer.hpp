@@ -56,10 +56,10 @@ public:
     void DrawMesh(
         const Assets::AssetRegistry &assets,
         MeshHandle mesh,
-        uint32_t instanceCount = 1,
-        uint32_t firstIndex = 0,
-        int32_t vertexOffset = 0,
-        uint32_t firstInstance = 0);
+        std::uint32_t instanceCount = 1,
+        std::uint32_t firstIndex = 0,
+        std::int32_t vertexOffset = 0,
+        std::uint32_t firstInstance = 0);
 
 private:
     CoreContextBackend &m_coreContext;
@@ -71,8 +71,8 @@ private:
     UniformBufferData m_uniformBufferData {};
 
     std::vector<FrameData> m_frames;
-    uint32_t m_imageIndex = 0;
-    uint32_t m_currentFrame = 0;
+    std::uint32_t m_imageIndex = 0;
+    std::uint32_t m_currentFrame = 0;
 };
 
 }

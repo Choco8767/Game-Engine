@@ -5,13 +5,7 @@
 
 #include <volk.h>
 
-#include "Graphics/Types/GraphicsHandles.hpp"
-
-namespace Engine::Graphics {
-
-enum class DescriptorType;
-
-}
+#include "Graphics/Types/DescriptorTypes.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -26,10 +20,10 @@ public:
 
     void WriteBuffer(
         const Buffer &buffer,
-        uint32_t binding,
+        std::uint32_t binding,
         Graphics::DescriptorType type,
-        uint64_t offset,
-        uint64_t range);
+        std::uint64_t offset,
+        std::uint64_t range);
 
 private:
     std::vector<VkWriteDescriptorSet> m_writes;

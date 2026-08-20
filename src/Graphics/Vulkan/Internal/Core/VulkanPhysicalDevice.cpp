@@ -33,7 +33,7 @@ int RateDeviceSuitability(
 
 bool CheckRequiredDeviceExtensionSupport(VkPhysicalDevice vkPhysicalDevice, const std::vector<const char *> deviceExtensions)
 {
-    uint32_t extensionCount;
+    std::uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extensionCount, nullptr);
 
     std::vector<VkExtensionProperties> pxtensions(extensionCount);
@@ -51,13 +51,13 @@ QueueFamilyIndices FindQueueFamilies(VkSurfaceKHR vkSurface, VkPhysicalDevice vk
 {
     QueueFamilyIndices indices;
 
-    uint32_t queueFamilyCount = 0;
+    std::uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, nullptr);
 
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
-    for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+    for (std::uint32_t i = 0; i < queueFamilies.size(); i++) {
         if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             indices.graphicsFamily = i;
 
@@ -70,7 +70,7 @@ QueueFamilyIndices FindQueueFamilies(VkSurfaceKHR vkSurface, VkPhysicalDevice vk
             break;
     }
 
-    for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+    for (std::uint32_t i = 0; i < queueFamilies.size(); i++) {
         if ((queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT) && !(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
             indices.transferFamily = i;
             break;
@@ -110,7 +110,7 @@ SwapchainSupportDetails QuerySwapchainSupport(VkSurfaceKHR vkSurface, VkPhysical
         &details.capabilities);
 
     // Formats
-    uint32_t formatCount;
+    std::uint32_t formatCount;
     vkGetPhysicalDeviceSurfaceFormatsKHR(
         vkPhysicalDevice,
         vkSurface,
@@ -126,7 +126,7 @@ SwapchainSupportDetails QuerySwapchainSupport(VkSurfaceKHR vkSurface, VkPhysical
     }
 
     // Present Modes
-    uint32_t presentModeCount;
+    std::uint32_t presentModeCount;
     vkGetPhysicalDeviceSurfacePresentModesKHR(
         vkPhysicalDevice,
         vkSurface,
@@ -163,7 +163,7 @@ PhysicalDevice CreatePhysicalDevice(
     const Instance &instance,
     const Surface &surface)
 {
-    uint32_t deviceCount = 0;
+    std::uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance.handle, &deviceCount, nullptr);
 
     if (deviceCount == 0)

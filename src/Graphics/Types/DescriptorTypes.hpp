@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Engine::Graphics {
 
-enum class DescriptorType {
+enum class DescriptorType : std::uint8_t {
     SAMPLER = 0,
     COMBINED_IMAGE_SAMPLER = 1,
     SAMPLED_IMAGE = 2,

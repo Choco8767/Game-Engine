@@ -3,12 +3,11 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
+#include <functional>
 
 #include "Utils/Passkey.hpp"
 
 #include "Graphics/Allocators/BufferAllocator.hpp"
-
-#include "Graphics/Vulkan/Internal/Commands/VulkanCommandPool.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
@@ -46,7 +45,7 @@ public:
     const Buffer &GetBuffer(BufferHandle handle) const;
 
 private:
-    const CoreContextBackend &m_coreContext;
+    std::reference_wrapper<const CoreContextBackend> m_coreContext;
 
     std::vector<Buffer> m_buffers;
     std::vector<std::size_t> m_freeBufferIndices;

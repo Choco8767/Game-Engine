@@ -89,7 +89,7 @@ WindowFramebufferSize WindowBackend::GetFramebufferSize() const
 
 std::vector<const char *> WindowBackend::GetRequiredInstanceExtensions() const
 {
-    uint32_t count = 0;
+    std::uint32_t count = 0;
     const char **extensions = glfwGetRequiredInstanceExtensions(&count);
 
     return std::vector<const char *>(extensions, extensions + count);

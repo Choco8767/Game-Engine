@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <vector>
 
 #include "Graphics/API.hpp"
 #include "Graphics/Types/GraphicsHandles.hpp"

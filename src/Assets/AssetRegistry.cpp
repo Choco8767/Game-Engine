@@ -31,14 +31,14 @@ void AssetRegistry::Destroy()
 
 MeshHandle AssetRegistry::CreateMesh(
     const std::vector<Graphics::Vertex> &vertices,
-    const std::vector<uint32_t> &indices)
+    const std::vector<std::uint32_t> &indices)
 {
     Engine::Graphics::BufferCreateInfo vertexBufferCreateInfo {
         .size = vertices.size() * sizeof(Engine::Graphics::Vertex),
         .usage = Engine::Graphics::BufferUsage::VERTEX
     };
     Engine::Graphics::BufferCreateInfo indexBufferCreateInfo {
-        .size = indices.size() * sizeof(uint32_t),
+        .size = indices.size() * sizeof(std::uint32_t),
         .usage = Engine::Graphics::BufferUsage::INDEX
     };
 
@@ -55,11 +55,11 @@ MeshHandle AssetRegistry::CreateMesh(
     MeshHandle handle {};
 
     if (!m_freeMeshes.empty()) {
-        handle.id = static_cast<uint32_t>(m_freeMeshes.back());
+        handle.id = static_cast<std::uint32_t>(m_freeMeshes.back());
         m_freeMeshes.pop_back();
         m_meshes[handle.id] = mesh;
     } else {
-        handle.id = static_cast<uint32_t>(m_meshes.size());
+        handle.id = static_cast<std::uint32_t>(m_meshes.size());
         m_meshes.push_back(mesh);
     }
 

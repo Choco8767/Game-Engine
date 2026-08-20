@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <format>
 #include <iostream>
-#include <limits>
 #include <stdexcept>
 #include <vector>
 
@@ -28,7 +27,7 @@ Swapchain CreateSwapchain(
 
     VkExtent2D vkExtent = ChooseSwapchainExtent(window, swapchainSupport.capabilities);
 
-    uint32_t imageCount = swapchainSupport.capabilities.minImageCount + 1;
+    std::uint32_t imageCount = swapchainSupport.capabilities.minImageCount + 1;
 
     if (swapchainSupport.capabilities.maxImageCount > 0
         && imageCount > swapchainSupport.capabilities.maxImageCount)
@@ -50,14 +49,14 @@ Swapchain CreateSwapchain(
         .oldSwapchain = VK_NULL_HANDLE
     };
 
-    std::vector<uint32_t> queueFamilyIndices = {
+    std::vector<std::uint32_t> queueFamilyIndices = {
         physicalDevice.queueFamilyIndices.graphicsFamily.value(),
         physicalDevice.queueFamilyIndices.presentFamily.value()
     };
 
     if (physicalDevice.queueFamilyIndices.graphicsFamily != physicalDevice.queueFamilyIndices.presentFamily) {
         vkSwapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-        vkSwapchainCreateInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
+        vkSwapchainCreateInfo.queueFamilyIndexCount = static_cast<std::uint32_t>(queueFamilyIndices.size());
         vkSwapchainCreateInfo.pQueueFamilyIndices = queueFamilyIndices.data();
     } else {
         vkSwapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -195,7 +194,7 @@ AcquireNextSwapchainImageResult AcquireNextSwapchainImage(
     const Semaphore &imageAvailable,
     Swapchain &swapchain)
 {
-    uint32_t imageIndex = UINT32_MAX;
+    std::uint32_t imageIndex = UINT32_MAX;
     VkResult vkResult = vkAcquireNextImageKHR(logicalDevice.handle, swapchain.handle, UINT64_MAX, imageAvailable.handle, VK_NULL_HANDLE, &imageIndex);
 
     return AcquireNextSwapchainImageResult {
@@ -207,7 +206,7 @@ AcquireNextSwapchainImageResult AcquireNextSwapchainImage(
 PresentSwapchainImageResult PresentSwapchainImage(
     VkQueue vkPresentQueue,
     const Swapchain &swapchain,
-    uint32_t imageIndex,
+    std::uint32_t imageIndex,
     const Semaphore &renderFinished)
 {
     std::array<VkSemaphore, 1> signalSemaphores = { renderFinished.handle };
@@ -215,9 +214,9 @@ PresentSwapchainImageResult PresentSwapchainImage(
 
     VkPresentInfoKHR vkPresentInfo {
         .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-        .waitSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size()),
+        .waitSemaphoreCount = static_cast<std::uint32_t>(signalSemaphores.size()),
         .pWaitSemaphores = signalSemaphores.data(),
-        .swapchainCount = static_cast<uint32_t>(swapchains.size()),
+        .swapchainCount = static_cast<std::uint32_t>(swapchains.size()),
         .pSwapchains = swapchains.data(),
         .pImageIndices = &imageIndex
     };

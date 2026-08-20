@@ -22,7 +22,7 @@ Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
     std::vector<const char *> extensions(requiredExtensions.begin(), requiredExtensions.end());
     extensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 
-    uint32_t extensionPropertyCount = 0;
+    std::uint32_t extensionPropertyCount = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, nullptr);
 
     std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
@@ -52,9 +52,9 @@ Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
         .pNext = ENABLE_VALIDATION_LAYERS ? &vkDebugMessengerCreateInfo : nullptr,
         .flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
         .pApplicationInfo = &vkAppInfo,
-        .enabledLayerCount = static_cast<uint32_t>(validationLayers.size()),
+        .enabledLayerCount = static_cast<std::uint32_t>(validationLayers.size()),
         .ppEnabledLayerNames = validationLayers.data(),
-        .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+        .enabledExtensionCount = static_cast<std::uint32_t>(extensions.size()),
         .ppEnabledExtensionNames = extensions.data()
     };
 

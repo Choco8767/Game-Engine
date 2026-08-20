@@ -20,9 +20,9 @@ struct DescriptorPool {
 };
 
 struct DescriptorPoolCreateInfo {
-    uint32_t maxSets = 0;
-    uint32_t uniformBufferCount = 0;
-    uint32_t imageSamplerCount = 0;
+    std::uint32_t maxSets = 0;
+    std::uint32_t uniformBufferCount = 0;
+    std::uint32_t imageSamplerCount = 0;
 };
 
 DescriptorPool CreateDescriptorPool(const LogicalDevice &logicalDevice, const DescriptorPoolCreateInfo &info);

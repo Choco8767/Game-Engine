@@ -29,7 +29,7 @@ DescriptorPool CreateDescriptorPool(const LogicalDevice &logicalDevice, const De
     VkDescriptorPoolCreateInfo vkDescriptorPoolCreateInfo {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .maxSets = info.maxSets,
-        .poolSizeCount = static_cast<uint32_t>(vkDescriptorPoolSizes.size()),
+        .poolSizeCount = static_cast<std::uint32_t>(vkDescriptorPoolSizes.size()),
         .pPoolSizes = vkDescriptorPoolSizes.data()
     };
 
@@ -71,7 +71,7 @@ std::vector<DescriptorSet> AllocateDescriptorSets(
     VkDescriptorSetAllocateInfo vkDescriptorSetAllocateInfo {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .descriptorPool = descriptorPool.handle,
-        .descriptorSetCount = static_cast<uint32_t>(descriptorSetLayouts.size()),
+        .descriptorSetCount = static_cast<std::uint32_t>(descriptorSetLayouts.size()),
         .pSetLayouts = vkDescriptorSetLayouts.data()
     };
 
@@ -118,7 +118,7 @@ void FreeDescriptorSets(
     VkResult vkResult = vkFreeDescriptorSets(
         vkDevice,
         descriptorPool.handle,
-        static_cast<uint32_t>(vkDescriptorSets.size()),
+        static_cast<std::uint32_t>(vkDescriptorSets.size()),
         vkDescriptorSets.data());
 
     if (vkResult != VK_SUCCESS)

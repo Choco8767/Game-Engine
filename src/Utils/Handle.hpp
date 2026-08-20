@@ -4,7 +4,7 @@
 
 template <typename T>
 struct Handle {
-    uint32_t id = 0;
+    std::uint32_t id = 0;
 
     bool operator==(const Handle &other) const { return id == other.id; }
     bool operator!=(const Handle &other) const { return id != other.id; }

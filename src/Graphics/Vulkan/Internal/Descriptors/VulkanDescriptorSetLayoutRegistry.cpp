@@ -40,7 +40,7 @@ DescriptorSetLayoutHandle DescriptorSetLayoutRegistry::CreateDescriptorSetLayout
 {
     VkDescriptorSetLayoutCreateInfo vkDescriptorSetLayoutCreateInfo {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-        .bindingCount = static_cast<uint32_t>(bindings.vkBindings.size()),
+        .bindingCount = static_cast<std::uint32_t>(bindings.vkBindings.size()),
         .pBindings = bindings.vkBindings.data()
     };
 
@@ -59,11 +59,11 @@ DescriptorSetLayoutHandle DescriptorSetLayoutRegistry::CreateDescriptorSetLayout
     DescriptorSetLayoutHandle handle {};
 
     if (!m_freeDescriptorSetLayouts.empty()) {
-        handle.id = static_cast<uint32_t>(m_freeDescriptorSetLayouts.back());
+        handle.id = static_cast<std::uint32_t>(m_freeDescriptorSetLayouts.back());
         m_freeDescriptorSetLayouts.pop_back();
         m_descriptorSetLayouts[handle.id] = descriptorSetLayout;
     } else {
-        handle.id = static_cast<uint32_t>(m_descriptorSetLayouts.size());
+        handle.id = static_cast<std::uint32_t>(m_descriptorSetLayouts.size());
         m_descriptorSetLayouts.push_back(descriptorSetLayout);
     }
 

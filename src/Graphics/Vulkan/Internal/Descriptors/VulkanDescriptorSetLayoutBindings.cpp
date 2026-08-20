@@ -10,8 +10,8 @@ namespace Engine::Graphics::Vulkan {
 void AddDescriptorLayoutBinding(
     DescriptorSetLayoutBindings &bindings,
     Graphics::DescriptorType type,
-    uint32_t binding,
-    uint32_t count,
+    std::uint32_t binding,
+    std::uint32_t count,
     Graphics::ShaderStage stage)
 {
     VkDescriptorSetLayoutBinding vkDescriptorSetLayoutBinding {

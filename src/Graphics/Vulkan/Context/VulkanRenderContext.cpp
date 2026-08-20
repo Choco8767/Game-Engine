@@ -91,15 +91,15 @@ std::unique_ptr<RenderContextBackend> RenderContextBackend::Create(const CoreCon
 
 void RenderContextBackend::Destroy()
 {
-    WaitIdle(m_coreContext.GetLogicalDevice());
+    WaitIdle(m_coreContext.get().GetLogicalDevice());
 
-    Vulkan::DestroyGraphicsPipeline(m_coreContext.GetLogicalDevice().handle, m_graphicsPipeline);
+    Vulkan::DestroyGraphicsPipeline(m_coreContext.get().GetLogicalDevice().handle, m_graphicsPipeline);
 
     m_descriptorSetLayoutRegistry.Destroy();
 
-    Vulkan::DestroyDescriptorPool(m_coreContext.GetLogicalDevice().handle, m_descriptorPool);
-    Vulkan::DestroyCommandPool(m_coreContext.GetLogicalDevice(), m_commandPool);
-    Vulkan::DestroyRenderPass(m_coreContext.GetLogicalDevice().handle, m_renderPass);
+    Vulkan::DestroyDescriptorPool(m_coreContext.get().GetLogicalDevice().handle, m_descriptorPool);
+    Vulkan::DestroyCommandPool(m_coreContext.get().GetLogicalDevice(), m_commandPool);
+    Vulkan::DestroyRenderPass(m_coreContext.get().GetLogicalDevice().handle, m_renderPass);
 }
 
 }

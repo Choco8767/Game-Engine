@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <functional>
 
 #include "Utils/Passkey.hpp"
 
@@ -56,7 +57,7 @@ public:
     DescriptorSetLayoutHandle GetGlobalDescriptorSetLayout() const { return m_globalDescriptorSetLayout; }
 
 private:
-    const CoreContextBackend &m_coreContext;
+    std::reference_wrapper<const CoreContextBackend> m_coreContext;
 
     RenderPass m_renderPass;
     GraphicsPipeline m_graphicsPipeline;

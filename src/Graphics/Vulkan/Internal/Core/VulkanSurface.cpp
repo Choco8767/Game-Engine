@@ -51,15 +51,15 @@ VkPresentModeKHR ChooseSwapchainPresentMode(const std::vector<VkPresentModeKHR> 
 
 VkExtent2D ChooseSwapchainExtent(const Engine::Window::Window &window, const VkSurfaceCapabilitiesKHR &capabilities)
 {
-    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+    if (capabilities.currentExtent.width != std::numeric_limits<std::uint32_t>::max())
         return capabilities.currentExtent;
 
     int width = window.GetFramebufferWidth();
     int height = window.GetFramebufferHeight();
 
     VkExtent2D actualExtent = {
-        static_cast<uint32_t>(width),
-        static_cast<uint32_t>(height)
+        static_cast<std::uint32_t>(width),
+        static_cast<std::uint32_t>(height)
     };
 
     actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);

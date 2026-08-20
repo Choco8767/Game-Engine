@@ -19,7 +19,7 @@ Framebuffer CreateFramebuffer(
     VkFramebufferCreateInfo vkFramebufferCreateInfo {
         .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
         .renderPass = renderPass.handle,
-        .attachmentCount = static_cast<uint32_t>(imageViews.size()),
+        .attachmentCount = static_cast<std::uint32_t>(imageViews.size()),
         .pAttachments = imageViews.data(),
         .width = extent.width,
         .height = extent.height,

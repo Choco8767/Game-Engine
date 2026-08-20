@@ -9,7 +9,6 @@
 
 #include "Graphics/Types/BufferTypes.hpp"
 #include "Graphics/Types/DescriptorTypes.hpp"
-#include "Graphics/Types/ShaderStageTypes.hpp"
 
 #include "Graphics/Vulkan/Context/VulkanCoreContext.hpp"
 #include "Graphics/Vulkan/Context/VulkanRenderContext.hpp"
@@ -17,10 +16,7 @@
 #include "Graphics/Vulkan/Allocators/VulkanBufferAllocator.hpp"
 
 #include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorSet.hpp"
-#include "Graphics/Vulkan/Internal/Descriptors/VulkanDescriptorSetLayoutBindings.hpp"
 #include "Graphics/Vulkan/Internal/Resources/VulkanBuffer.hpp"
-
-#include "Graphics/Vulkan/Helpers/VulkanVertexHelpers.hpp"
 
 static auto start = std::chrono::high_resolution_clock::now();
 
@@ -175,10 +171,10 @@ void RendererBackend::EndFrame(const Engine::Window::Window &window)
 void RendererBackend::DrawMesh(
     const Assets::AssetRegistry &assets,
     MeshHandle mesh,
-    uint32_t instanceCount,
-    uint32_t firstIndex,
-    int32_t vertexOffset,
-    uint32_t firstInstance)
+    std::uint32_t instanceCount,
+    std::uint32_t firstIndex,
+    std::int32_t vertexOffset,
+    std::uint32_t firstInstance)
 {
     FrameData &currentFrame = m_frames[m_currentFrame];
 
