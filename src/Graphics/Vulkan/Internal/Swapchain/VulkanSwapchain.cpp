@@ -77,8 +77,6 @@ Swapchain CreateSwapchain(
     vkImages.resize(imageCount);
     vkGetSwapchainImagesKHR(logicalDevice.handle, handle, &imageCount, vkImages.data());
 
-    std::vector<VkImageView> vkImageViews;
-
     return Swapchain {
         .handle = handle,
         .format = surface.surfaceFormat.format,
@@ -105,6 +103,8 @@ void DestroySwapchain(VkDevice vkDevice, Swapchain &swapchain)
         vkDestroySwapchainKHR(vkDevice, swapchain.handle, nullptr);
         swapchain.handle = VK_NULL_HANDLE;
     }
+
+    swapchain.images.clear();
 }
 
 void RecreateSwapchain(
@@ -121,11 +121,7 @@ void RecreateSwapchain(
 
     Vulkan::DestroySwapchain(logicalDevice.handle, swapchain);
 
-    std::optional<Swapchain> optSwapchain = CreateSwapchain(window, surface, physicalDevice, logicalDevice);
-    if (!optSwapchain.has_value())
-        return;
-
-    swapchain = optSwapchain.value();
+    swapchain = CreateSwapchain(window, surface, physicalDevice, logicalDevice);
 
     InitSwapchainImageViews(logicalDevice, swapchain);
     InitSwapchainFramebuffers(logicalDevice, renderPass, swapchain);
@@ -162,8 +158,7 @@ void InitSwapchainImageViews(
 
         VkResult vkResult = vkCreateImageView(logicalDevice.handle, &vkImageViewCreateInfo, nullptr, &swapchain.imageViews[i]);
         if (vkResult != VK_SUCCESS) {
-            std::cerr << "Failed to Create Vulkan Image Views. Error Code: " << vkResult << "\n";
-            return;
+            throw std::runtime_error(std::format("Failed to Create Vulkan Image View for Swapchain Image {}. Error Code: {}", i, static_cast<int>(vkResult)));
         }
 
         std::cout << "Vulkan Image View Created Successfully for Swapchain Image " << i << ".\n";
@@ -222,9 +217,6 @@ PresentSwapchainImageResult PresentSwapchainImage(
     };
 
     VkResult vkResult = vkQueuePresentKHR(vkPresentQueue, &vkPresentInfo);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Submit Swapchain Image to Present Queue. Error Code: " << vkResult << "\n";
-    }
 
     return PresentSwapchainImageResult {
         .result = vkResult

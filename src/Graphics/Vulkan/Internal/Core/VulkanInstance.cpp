@@ -16,7 +16,7 @@ Instance CreateInstance(const std::vector<const char *> &requiredExtensions)
         .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
         .pEngineName = "No Engine",
         .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-        .apiVersion = VK_API_VERSION_1_4
+        .apiVersion = VK_API_VERSION_1_3
     };
 
     std::vector<const char *> extensions(requiredExtensions.begin(), requiredExtensions.end());

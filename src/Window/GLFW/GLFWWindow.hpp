@@ -1,9 +1,8 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include "../Window.hpp"
+
+struct GLFWwindow;
 
 namespace Engine::Window::GLFW {
 
@@ -17,8 +16,6 @@ public:
         int height,
         const char *title) override;
 
-    VkSurfaceKHR CreateVulkanWindowSurface(VkInstance vkInstance) override;
-
     void Destroy() override;
 
     void Update() override;
@@ -30,15 +27,15 @@ public:
     int GetFramebufferHeight() const override;
     WindowFramebufferSize GetFramebufferSize() const override;
 
-    std::vector<const char *> GetRequiredInstanceExtensions() const override;
+    NativeHandle GetNativeHandle() const override;
 
 private:
-    GLFWwindow *m_handle;
-
-    bool m_hasResized = false;
+    GLFWwindow *m_handle = nullptr;
 
     WindowFramebufferSize m_currentFramebufferSize {};
     WindowFramebufferSize m_lastFramebufferSize {};
+
+    bool m_framebufferSizeInitialized = false;
 };
 
 }

@@ -19,8 +19,10 @@ void DescriptorWriter::Clear()
 
 void DescriptorWriter::Update(const LogicalDevice &logicalDevice, DescriptorSet targetSet)
 {
-    for (auto &write : m_writes)
-        write.dstSet = targetSet.handle;
+    for (std::size_t i = 0; i < m_writes.size(); i++) {
+        m_writes[i].dstSet = targetSet.handle;
+        m_writes[i].pBufferInfo = &m_bufferInfos[i];
+    }
 
     vkUpdateDescriptorSets(
         logicalDevice.handle,
@@ -44,12 +46,13 @@ void DescriptorWriter::WriteBuffer(
         .range = range == 0 ? buffer.allocation.size : range
     };
 
+    m_bufferInfos.emplace_back(bufferInfo);
+
     VkWriteDescriptorSet vkWriteDescriptorSet {
         .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
         .dstBinding = binding,
         .descriptorCount = 1,
         .descriptorType = MapDescriptorType(type),
-        .pBufferInfo = &m_bufferInfos.emplace_back(bufferInfo)
     };
 
     m_writes.push_back(vkWriteDescriptorSet);

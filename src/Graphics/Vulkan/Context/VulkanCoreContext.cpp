@@ -7,6 +7,8 @@
 
 #include "Window/Window.hpp"
 
+#include "../Internal/Core/VulkanWindow.hpp"
+
 namespace Engine::Graphics::Vulkan {
 
 CoreContextBackend::CoreContextBackend(
@@ -34,10 +36,10 @@ std::unique_ptr<CoreContextBackend> CoreContextBackend::Create(Engine::Window::W
     if (volkInitialize() != VK_SUCCESS)
         throw std::runtime_error("Failed to Initialize Volk Loader.");
 
-    auto requiredExtensions = window.GetRequiredInstanceExtensions();
+    auto requiredExtensions = Vulkan::GetRequiredInstanceExtensions();
 
     auto instance = Vulkan::CreateInstance(requiredExtensions);
-    auto surface = Vulkan::CreateSurface(instance, window);
+    auto surface = Vulkan::CreateSurface(instance, window.GetNativeHandle());
     auto physicalDevice = Vulkan::CreatePhysicalDevice(instance, surface);
     PopulateSurfaceDetails(physicalDevice, surface);
     auto logicalDevice = Vulkan::CreateLogicalDevice(physicalDevice);

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Utils/Passkey.hpp"
+#include "Graphics/API.hpp"
 
 namespace Engine::Graphics {
 
@@ -12,20 +12,15 @@ class BufferAllocator;
 
 class AllocatorContext {
 public:
-    AllocatorContext(
-        Passkey<AllocatorContext>,
-        std::unique_ptr<BufferAllocator> bufferAllocator);
-    ~AllocatorContext();
+    virtual ~AllocatorContext();
 
     static std::unique_ptr<AllocatorContext> Create(const CoreContext &coreContext);
-    void Destroy();
+    virtual void Destroy() = 0;
 
     // Getters
-    BufferAllocator &GetBufferAllocator();
-    const BufferAllocator &GetBufferAllocator() const;
-
-private:
-    std::unique_ptr<BufferAllocator> m_bufferAllocator;
+    virtual BufferAllocator &GetBufferAllocator() = 0;
+    virtual const BufferAllocator &GetBufferAllocator() const = 0;
+    virtual API GetAPIType() const noexcept = 0;
 };
 
 }

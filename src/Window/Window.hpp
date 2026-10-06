@@ -1,14 +1,10 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include <volk.h>
-
+#include "NativeHandle.hpp"
 #include "WindowAPI.hpp"
 #include "WindowConstants.hpp"
-
-typedef VkSurfaceKHR_T *VkSurfaceKHR;
 
 namespace Engine::Window {
 
@@ -28,8 +24,6 @@ public:
         = 0;
     virtual void Destroy() = 0;
 
-    virtual VkSurfaceKHR CreateVulkanWindowSurface(VkInstance vkInstance) = 0;
-
     virtual void Update() = 0;
 
     virtual bool ShouldClose() const = 0;
@@ -39,7 +33,7 @@ public:
     virtual int GetFramebufferHeight() const = 0;
     virtual WindowFramebufferSize GetFramebufferSize() const = 0;
 
-    virtual std::vector<const char *> GetRequiredInstanceExtensions() const = 0;
+    virtual NativeHandle GetNativeHandle() const = 0;
 };
 
 std::unique_ptr<Window> CreateWindow(API api);

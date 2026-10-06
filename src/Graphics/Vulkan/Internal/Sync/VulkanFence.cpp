@@ -40,12 +40,16 @@ void DestroyFence(VkDevice vkDevice, Fence &fence)
 
 void WaitForFence(const LogicalDevice &logicalDevice, const Fence &fence)
 {
-    vkWaitForFences(logicalDevice.handle, 1, &fence.handle, VK_TRUE, UINT64_MAX);
+    VkResult vkResult = vkWaitForFences(logicalDevice.handle, 1, &fence.handle, VK_TRUE, UINT64_MAX);
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Wait for Vulkan Fence. Error Code: {}", static_cast<int>(vkResult)));
 }
 
 void ResetFence(const LogicalDevice &logicalDevice, const Fence &fence)
 {
-    vkResetFences(logicalDevice.handle, 1, &fence.handle);
+    VkResult vkResult = vkResetFences(logicalDevice.handle, 1, &fence.handle);
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Reset Vulkan Fence. Error Code: {}", static_cast<int>(vkResult)));
 }
 
 }

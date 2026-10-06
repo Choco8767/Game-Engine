@@ -15,13 +15,14 @@ set(SOURCES
     "Assets/AssetRegistry.cpp"
 
     # Renderer
+    "Graphics/Renderer.cpp"
     "Graphics/Context/Context.cpp"
     "Graphics/Context/CoreContext.cpp"
     "Graphics/Context/RenderContext.cpp"
     "Graphics/Context/AllocatorContext.cpp"
-    "Graphics/Allocators/BufferAllocator.cpp"
     "Graphics/Vulkan/Context/VulkanCoreContext.cpp"
     "Graphics/Vulkan/Context/VulkanRenderContext.cpp"
+    "Graphics/Vulkan/Context/VulkanAllocatorContext.cpp"
     "Graphics/Vulkan/Allocators/VulkanBufferAllocator.cpp"
     "Graphics/Vulkan/VulkanRenderer.cpp"
     "Graphics/Vulkan/Helpers/VulkanBufferTypes.cpp"
@@ -29,6 +30,7 @@ set(SOURCES
     "Graphics/Vulkan/Internal/Core/VulkanInstance.cpp"
     "Graphics/Vulkan/Internal/Core/VulkanDebugMessenger.cpp"
     "Graphics/Vulkan/Internal/Core/VulkanSurface.cpp"
+    "Graphics/Vulkan/Internal/Core/VulkanWindow.cpp"
     "Graphics/Vulkan/Internal/Core/VulkanPhysicalDevice.cpp"
     "Graphics/Vulkan/Internal/Core/VulkanLogicalDevice.cpp"
     "Graphics/Vulkan/Internal/Swapchain/VulkanSwapchain.cpp"

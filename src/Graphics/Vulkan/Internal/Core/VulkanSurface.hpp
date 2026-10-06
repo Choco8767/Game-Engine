@@ -21,7 +21,6 @@ struct Surface {
     VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
 };
 
-Surface CreateSurface(const Instance &instance, Engine::Window::Window &window);
 void DestroySurface(VkInstance vkInstance, Surface &surface);
 
 VkSurfaceFormatKHR ChooseSwapchainSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats);

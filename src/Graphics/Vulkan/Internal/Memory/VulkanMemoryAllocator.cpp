@@ -28,7 +28,7 @@ MemoryAllocator CreateMemoryAllocator(
         .physicalDevice = physicalDevice.handle,
         .device = logicalDevice.handle,
         .instance = instance.handle,
-        .vulkanApiVersion = VK_API_VERSION_1_4
+        .vulkanApiVersion = VK_API_VERSION_1_3
     };
 
     VmaVulkanFunctions vmaVulkanFunctions {};

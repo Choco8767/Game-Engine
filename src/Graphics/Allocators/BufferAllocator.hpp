@@ -8,15 +8,12 @@
 
 namespace Engine::Graphics {
 
-class CoreContext;
-
 struct BufferCreateInfo;
 
 class BufferAllocator {
 public:
     virtual ~BufferAllocator() = default;
 
-    static std::unique_ptr<BufferAllocator> Create(const CoreContext &coreContext);
     virtual void Destroy() = 0;
 
     virtual BufferHandle CreateBuffer(

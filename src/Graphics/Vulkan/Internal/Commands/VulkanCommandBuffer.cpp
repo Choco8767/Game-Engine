@@ -57,17 +57,15 @@ void BeginCommandBuffer(CommandBuffer &commandBuffer)
     };
 
     VkResult vkResult = vkBeginCommandBuffer(commandBuffer.handle, &vkCommandBufferBeginInfo);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Begin Recording Vulkan Command Buffer. Error Code: " << vkResult << "\n";
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Begin Recording Vulkan Command Buffer. Error Code: {}", static_cast<int>(vkResult)));
 }
 
 void EndCommandBuffer(CommandBuffer &commandBuffer)
 {
     VkResult vkResult = vkEndCommandBuffer(commandBuffer.handle);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to End Recording Vulkan Command Buffer. Error Code: " << vkResult << "\n";
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to End Recording Vulkan Command Buffer. Error Code: {}", static_cast<int>(vkResult)));
 }
 
 void SubmitCommandBuffer(
@@ -89,23 +87,22 @@ void SubmitCommandBuffer(
         std::array<VkPipelineStageFlags, 1> waitStages = { waitStage.value() };
 
         vkSubmitInfo.waitSemaphoreCount = static_cast<std::uint32_t>(waitSemaphores.size());
-        vkSubmitInfo.pWaitSemaphores = &waitSemaphore->handle;
-        vkSubmitInfo.pWaitDstStageMask = &waitStage.value();
+        vkSubmitInfo.pWaitSemaphores = waitSemaphores.data();
+        vkSubmitInfo.pWaitDstStageMask = waitStages.data();
     }
 
     if (signalSemaphore.has_value()) {
         std::array<VkSemaphore, 1> signalSemaphores = { signalSemaphore->handle };
 
         vkSubmitInfo.signalSemaphoreCount = static_cast<std::uint32_t>(signalSemaphores.size());
-        vkSubmitInfo.pSignalSemaphores = &signalSemaphore->handle;
+        vkSubmitInfo.pSignalSemaphores = signalSemaphores.data();
     }
 
     VkFence vkFence = fence.has_value() ? fence->handle : VK_NULL_HANDLE;
 
     VkResult vkResult = vkQueueSubmit(vkQueue, 1, &vkSubmitInfo, vkFence);
-    if (vkResult != VK_SUCCESS) {
-        std::cerr << "Failed to Submit Command Buffer to Queue. Error Code: " << vkResult << "\n";
-    }
+    if (vkResult != VK_SUCCESS)
+        throw std::runtime_error(std::format("Failed to Submit Command Buffer to Queue. Error Code: {}", static_cast<int>(vkResult)));
 }
 
 void BeginRenderPass(

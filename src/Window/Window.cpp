@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+#include <stdexcept>
+
 #include "GLFW/GLFWWindow.hpp"
 
 namespace Engine::Window {
@@ -17,9 +19,10 @@ std::unique_ptr<Window> CreateWindow(API api)
     }
 
     if (!window)
-        return nullptr;
+        throw std::runtime_error("Failed to Create Window. Unknown or Unsupported Window API.");
 
-    window->Init();
+    if (!window->Init())
+        throw std::runtime_error("Failed to Initialize Window.");
 
     return window;
 }

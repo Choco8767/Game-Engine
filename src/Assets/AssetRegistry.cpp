@@ -1,7 +1,12 @@
 #include "AssetRegistry.hpp"
 
-#include "Graphics/Allocators/BufferAllocator.hpp"
+#include <format>
+#include <stdexcept>
+
 #include "Graphics/Context/AllocatorContext.hpp"
+
+#include "Graphics/Allocators/BufferAllocator.hpp"
+
 #include "Graphics/Core/Vertex.hpp"
 #include "Graphics/Types/BufferTypes.hpp"
 
@@ -19,13 +24,16 @@ AssetRegistry::~AssetRegistry()
 
 void AssetRegistry::Destroy()
 {
+    for (std::size_t i = 0; i < m_meshes.size(); i++) {
+        if (!m_meshLive[i])
+            continue;
 
-    for (const auto &mesh : m_meshes) {
-        m_allocatorContext.GetBufferAllocator().DestroyBuffer(mesh.vertexBuffer);
-        m_allocatorContext.GetBufferAllocator().DestroyBuffer(mesh.indexBuffer);
+        m_allocatorContext.GetBufferAllocator().DestroyBuffer(m_meshes[i].vertexBuffer);
+        m_allocatorContext.GetBufferAllocator().DestroyBuffer(m_meshes[i].indexBuffer);
     }
 
     m_meshes.clear();
+    m_meshLive.clear();
     m_freeMeshes.clear();
 }
 
@@ -33,6 +41,9 @@ MeshHandle AssetRegistry::CreateMesh(
     const std::vector<Graphics::Vertex> &vertices,
     const std::vector<std::uint32_t> &indices)
 {
+    if (vertices.empty() || indices.empty())
+        throw std::runtime_error("Attempted to Create a Mesh with no Geometry.");
+
     Engine::Graphics::BufferCreateInfo vertexBufferCreateInfo {
         .size = vertices.size() * sizeof(Engine::Graphics::Vertex),
         .usage = Engine::Graphics::BufferUsage::VERTEX
@@ -45,7 +56,7 @@ MeshHandle AssetRegistry::CreateMesh(
     BufferHandle vertexBuffer = m_allocatorContext.GetBufferAllocator().CreateBuffer(vertexBufferCreateInfo, vertices.data());
     BufferHandle indexBuffer = m_allocatorContext.GetBufferAllocator().CreateBuffer(indexBufferCreateInfo, indices.data());
 
-    GraphicsMesh mesh {
+    MeshAsset mesh {
         .vertexBuffer = vertexBuffer,
         .indexBuffer = indexBuffer,
         .vertexCount = vertices.size(),
@@ -55,7 +66,7 @@ MeshHandle AssetRegistry::CreateMesh(
     MeshHandle handle {};
 
     if (!m_freeMeshes.empty()) {
-        handle.id = static_cast<std::uint32_t>(m_freeMeshes.back());
+        handle.id = m_freeMeshes.back();
         m_freeMeshes.pop_back();
         m_meshes[handle.id] = mesh;
     } else {
@@ -63,15 +74,33 @@ MeshHandle AssetRegistry::CreateMesh(
         m_meshes.push_back(mesh);
     }
 
+    m_meshLive.resize(m_meshes.size(), false);
+    m_meshLive[handle.id] = true;
+
     return handle;
 }
 
-void AssetRegistry::DestroyMesh(MeshHandle mesh)
+void AssetRegistry::DestroyMesh(MeshHandle handle)
 {
-    const auto &rawMesh = GetMesh(mesh);
+    const MeshAsset &mesh = GetMesh(handle);
 
-    m_allocatorContext.GetBufferAllocator().DestroyBuffer(rawMesh.vertexBuffer);
-    m_allocatorContext.GetBufferAllocator().DestroyBuffer(rawMesh.indexBuffer);
+    m_allocatorContext.GetBufferAllocator().DestroyBuffer(mesh.vertexBuffer);
+    m_allocatorContext.GetBufferAllocator().DestroyBuffer(mesh.indexBuffer);
+
+    m_meshes[handle.id] = MeshAsset {};
+    m_meshLive[handle.id] = false;
+    m_freeMeshes.push_back(handle.id);
+}
+
+const MeshAsset &AssetRegistry::GetMesh(MeshHandle handle) const
+{
+    if (handle.id >= m_meshes.size())
+        throw std::runtime_error(std::format("Invalid Mesh Handle ID: {}", handle.id));
+
+    if (!m_meshLive[handle.id])
+        throw std::runtime_error(std::format("Stale Mesh Handle ID: {}", handle.id));
+
+    return m_meshes[handle.id];
 }
 
 }

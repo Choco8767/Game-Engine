@@ -17,6 +17,7 @@ namespace Engine::Graphics {
 class CoreContext;
 class RenderContext;
 class AllocatorContext;
+class Renderer;
 
 class Context {
 public:
@@ -24,8 +25,9 @@ public:
         Passkey<Context>,
         std::unique_ptr<CoreContext> coreContext,
         std::unique_ptr<RenderContext> renderContext,
-        std::unique_ptr<AllocatorContext> allocatorContext);
-    ~Context() = default;
+        std::unique_ptr<AllocatorContext> allocatorContext,
+        std::unique_ptr<Renderer> renderer);
+    ~Context();
 
     Context(const Context &other) = delete;
     Context &operator=(const Context &other) = delete;
@@ -42,11 +44,14 @@ public:
     const RenderContext &GetRenderContext() const { return *m_renderContext; }
     AllocatorContext &GetAllocatorContext() { return *m_allocatorContext; }
     const AllocatorContext &GetAllocatorContext() const { return *m_allocatorContext; }
+    Renderer &GetRenderer() { return *m_renderer; }
+    const Renderer &GetRenderer() const { return *m_renderer; }
 
 private:
     std::unique_ptr<CoreContext> m_coreContext;
     std::unique_ptr<RenderContext> m_renderContext;
     std::unique_ptr<AllocatorContext> m_allocatorContext;
+    std::unique_ptr<Renderer> m_renderer;
 };
 
 }

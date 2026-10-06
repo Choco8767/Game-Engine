@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Assets/Types/AssetHandles.hpp"
-#include "Assets/Types/GraphicsMesh.hpp"
+#include "Assets/Types/MeshAsset.hpp"
 
 namespace Engine::Graphics {
 
@@ -15,8 +15,6 @@ struct Vertex;
 }
 
 namespace Engine::Assets {
-
-struct GraphicsMesh;
 
 class AssetRegistry {
 public:
@@ -31,13 +29,14 @@ public:
     void DestroyMesh(MeshHandle mesh);
 
     // Getters
-    const GraphicsMesh &GetMesh(MeshHandle mesh) const { return m_meshes[mesh.id]; }
+    const MeshAsset &GetMesh(MeshHandle mesh) const;
 
 private:
     Graphics::AllocatorContext &m_allocatorContext;
 
-    std::vector<GraphicsMesh> m_meshes;
-    std::vector<std::size_t> m_freeMeshes;
+    std::vector<MeshAsset> m_meshes;
+    std::vector<bool> m_meshLive;
+    std::vector<std::uint32_t> m_freeMeshes;
 };
 
 }

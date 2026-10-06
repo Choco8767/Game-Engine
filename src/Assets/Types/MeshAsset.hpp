@@ -6,7 +6,7 @@
 
 namespace Engine::Assets {
 
-struct GraphicsMesh {
+struct MeshAsset {
     BufferHandle vertexBuffer {};
     BufferHandle indexBuffer {};
     std::size_t vertexCount = 0;

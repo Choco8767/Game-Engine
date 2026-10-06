@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 #include <volk.h>
@@ -39,6 +40,11 @@ struct AcquireNextSwapchainImageResult {
     {
         return result == VK_ERROR_OUT_OF_DATE_KHR;
     }
+
+    bool Succeeded() const
+    {
+        return result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR;
+    }
 };
 
 struct PresentSwapchainImageResult {
@@ -48,6 +54,11 @@ struct PresentSwapchainImageResult {
     {
         return result == VK_ERROR_OUT_OF_DATE_KHR
             || result == VK_SUBOPTIMAL_KHR;
+    }
+
+    bool Succeeded() const
+    {
+        return result == VK_SUCCESS;
     }
 };
 

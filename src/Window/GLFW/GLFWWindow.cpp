@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <GLFW/glfw3.h>
+
 namespace Engine::Window::GLFW {
 
 WindowBackend::~WindowBackend()
@@ -24,32 +26,35 @@ bool WindowBackend::Init(
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
     m_handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (m_handle == nullptr) {
+        std::cerr << "GLFW Failed to Create Window.\n";
+        return false;
+    }
 
     return true;
 }
 
-VkSurfaceKHR WindowBackend::CreateVulkanWindowSurface(VkInstance vkInstance)
-{
-    VkSurfaceKHR surface = VK_NULL_HANDLE;
-
-    VkResult vkResult = glfwCreateWindowSurface(vkInstance, m_handle, nullptr, &surface);
-    if (vkResult != VK_SUCCESS)
-        throw std::runtime_error(std::format("Failed to Create Vulkan Window Surface. Error Code: {}", static_cast<int>(vkResult)));
-
-    std::cout << "Vulkan Window Surface Created Successfully.\n";
-
-    return surface;
-}
-
 void WindowBackend::Destroy()
 {
+    if (m_handle == nullptr)
+        return;
+
     glfwDestroyWindow(m_handle);
+    m_handle = nullptr;
+
     glfwTerminate();
 }
 
 void WindowBackend::Update()
 {
     glfwPollEvents();
+
+    if (!m_framebufferSizeInitialized) {
+        m_currentFramebufferSize = GetFramebufferSize();
+        m_lastFramebufferSize = m_currentFramebufferSize;
+        m_framebufferSizeInitialized = true;
+        return;
+    }
 
     m_lastFramebufferSize = m_currentFramebufferSize;
 
@@ -77,8 +82,8 @@ int WindowBackend::GetFramebufferHeight() const { return GetFramebufferSize().he
 
 WindowFramebufferSize WindowBackend::GetFramebufferSize() const
 {
-    int width = INT_MAX;
-    int height = INT_MAX;
+    int width = 0;
+    int height = 0;
     glfwGetFramebufferSize(m_handle, &width, &height);
 
     return WindowFramebufferSize {
@@ -87,12 +92,9 @@ WindowFramebufferSize WindowBackend::GetFramebufferSize() const
     };
 }
 
-std::vector<const char *> WindowBackend::GetRequiredInstanceExtensions() const
+NativeHandle WindowBackend::GetNativeHandle() const
 {
-    std::uint32_t count = 0;
-    const char **extensions = glfwGetRequiredInstanceExtensions(&count);
-
-    return std::vector<const char *>(extensions, extensions + count);
+    return m_handle;
 }
 
 }

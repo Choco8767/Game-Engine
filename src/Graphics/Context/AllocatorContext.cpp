@@ -1,37 +1,26 @@
 #include "AllocatorContext.hpp"
 
-#include "Graphics/Allocators/BufferAllocator.hpp"
+#include <stdexcept>
+#include <format>
+
+#include "Graphics/Vulkan/Context/VulkanCoreContext.hpp"
+#include "Graphics/Vulkan/Context/VulkanAllocatorContext.hpp"
 
 namespace Engine::Graphics {
 
-AllocatorContext::AllocatorContext(
-    Passkey<AllocatorContext>,
-    std::unique_ptr<BufferAllocator> bufferAllocator)
-    : m_bufferAllocator(std::move(bufferAllocator))
-{
-}
-
-AllocatorContext::~AllocatorContext()
-{
-    Destroy();
-}
+AllocatorContext::~AllocatorContext() = default;
 
 std::unique_ptr<AllocatorContext> AllocatorContext::Create(const CoreContext &coreContext)
 {
-    auto bufferAllocator = BufferAllocator::Create(coreContext);
+    switch (coreContext.GetAPIType()) {
+    case API::VULKAN: {
+        const auto& vulkanCoreContext = static_cast<const Vulkan::CoreContextBackend&>(coreContext);
+        return Vulkan::AllocatorContextBackend::Create(vulkanCoreContext);
+    }
 
-    return std::make_unique<AllocatorContext>(
-        Passkey<AllocatorContext> {},
-        std::move(bufferAllocator));
+    default:
+        throw std::runtime_error(std::format("Invalid Graphics API Enum: {}", static_cast<int>(coreContext.GetAPIType())));
+    }
 }
-
-void AllocatorContext::Destroy()
-{
-    m_bufferAllocator->Destroy();
-}
-
-// Getters
-BufferAllocator &AllocatorContext::GetBufferAllocator() { return *m_bufferAllocator; }
-const BufferAllocator &AllocatorContext::GetBufferAllocator() const { return *m_bufferAllocator; }
 
 }

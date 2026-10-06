@@ -7,7 +7,10 @@
 
 #include "Utils/Passkey.hpp"
 
+#include "Graphics/API.hpp"
 #include "Graphics/Allocators/BufferAllocator.hpp"
+#include "Graphics/Types/GraphicsHandles.hpp"
+#include "Graphics/Types/BufferTypes.hpp"
 
 namespace Engine::Graphics::Vulkan {
 
